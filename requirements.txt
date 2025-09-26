@@ -1,0 +1,64 @@
+INSTALLERS:
+
+pip install pyside6
+pip install --upgrade pip
+
+
+ML PACKAGES:
+
+pip install pandas numpy scikit-learn   # This is for data manipulation and machine learning
+pip install imbalanced-learn            # This is for handling imbalanced datasets in machine learning
+pip install xgboost                     # This is for XGBoost model meaning eXtreme Gradient Boosting that is an optimized distributed gradient boosting library designed to be highly efficient, flexible and portable
+pip install shap                        # This is for SHAP (SHapley Additive exPlanations) to explain model predictions
+pip instpip install joblib              # This is for joblib to save and load machine learning models   
+pip install matplotlib   
+
+Package            Version
+------------------ -----------
+beautifulsoup4     4.13.5
+certifi            2025.8.3
+charset-normalizer 3.4.3
+dnspython          2.8.0
+filelock           3.19.1
+idna               3.10
+imbalanced-learn   0.14.0
+joblib             1.5.2
+numpy              2.3.3
+pandas             2.3.2
+pip                25.2
+PySide6            6.9.2
+PySide6_Addons     6.9.2
+PySide6_Essentials 6.9.2
+python-dateutil    2.9.0.post0
+python-whois       0.9.5
+pytz               2025.2
+requests           2.32.5
+requests-file      2.1.0
+scikit-learn       1.7.2
+scipy              1.16.2
+setuptools         80.9.0
+shiboken6          6.9.2
+six                1.17.0
+soupsieve          2.8
+threadpoolctl      3.6.0
+tldextract         5.3.0
+typing_extensions  4.15.0
+tzdata             2025.2
+urllib3            2.5.0
+wheel              0.45.1
+
+
+
+GITHUB 
+
+git --version
+git init
+git remote add origin https://github.com/WizardofO/Capstone2_GUI_App_Development_9_24_2025.git
+git add .
+git commit -m "first commit"
+git branch -M main
+git push -u origin main
+
+git pull origin main --rebase
+git push -u origin main
+
