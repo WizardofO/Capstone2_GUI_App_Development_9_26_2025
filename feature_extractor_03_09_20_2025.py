@@ -1,4 +1,6 @@
-# phishing_features.py
+# MOIT-200 CAPSTONE2_TITLE: Signature-Based Analysis of Open-Source Phishing Toolkits for Machine Learning-Based Detection "A Case Study Using BlackEye and Zphisher and other sites"
+# Author: Osias Nieva 
+
 """
 Complete feature extractor for 35 phishing-related features.
 

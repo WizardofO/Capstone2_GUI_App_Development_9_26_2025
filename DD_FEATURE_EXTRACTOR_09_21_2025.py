@@ -1,4 +1,5 @@
-# phishing_gui.py
+# MOIT-200 CAPSTONE2_TITLE: Signature-Based Analysis of Open-Source Phishing Toolkits for Machine Learning-Based Detection "A Case Study Using BlackEye and Zphisher and other sites"
+# Author: Osias Nieva 
 """
 REQUIREMENTS:
 PySide6 GUI wrapper around the 35-feature phishing extractor.

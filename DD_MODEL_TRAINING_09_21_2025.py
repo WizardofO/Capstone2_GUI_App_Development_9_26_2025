@@ -1,4 +1,5 @@
-# phishing_gui_pipeline.py
+# MOIT-200 CAPSTONE2_TITLE: Signature-Based Analysis of Open-Source Phishing Toolkits for Machine Learning-Based Detection "A Case Study Using BlackEye and Zphisher and other sites"
+# Author: Osias Nieva 
 """
 PySide6 GUI for training / saving / using a phishing detection pipeline.
 
