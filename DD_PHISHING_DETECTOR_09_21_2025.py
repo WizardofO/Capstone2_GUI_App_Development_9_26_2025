@@ -43,7 +43,7 @@ import tldextract
 import dns.resolver
 import hashlib
 from bs4 import BeautifulSoup
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 REQUESTS_TIMEOUT = 10
 LOGO_HASH_FILE = os.getenv('LOGO_HASH_FILE', 'logo_hashes.json')
 TRANC0_LOCAL = os.getenv('TRANCO_CSV_PATH', 'tranco.csv')
@@ -53,15 +53,15 @@ def safe_requests_get(url, **kwargs):
         return requests.get(url, timeout=REQUESTS_TIMEOUT, **kwargs)
     except Exception:
         return None
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 def md5_bytes(data: bytes) -> str:
     return hashlib.md5(data).hexdigest()
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 def normalize_domain(hostname: str) -> str:
     if not hostname:
         return ''
     return hostname.lower().strip().lstrip('www.')
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 class PhishingFeatureExtractor:
     def __init__(self, url: str = None, html_content: str = None, file_mode: bool = False):
         self.url = url
@@ -91,7 +91,7 @@ class PhishingFeatureExtractor:
                         self.known_logo_hashes = set(data)
         except Exception:
             self.known_logo_hashes = set()
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def fetch_html(self) -> str:
         if not self.url:
             return ''
@@ -101,7 +101,7 @@ class PhishingFeatureExtractor:
             return r.text or ''
         except Exception:
             return ''
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 1
     def ip_in_url(self) -> int:
         if not self.url:
@@ -489,7 +489,7 @@ class PhishingFeatureExtractor:
             return count
         except Exception:
             return 0
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def extract_all(self) -> dict:
         result = {}
         result['ip_in_url'] = int(self.ip_in_url())
@@ -497,35 +497,37 @@ class PhishingFeatureExtractor:
         result['url_shortening'] = int(self.url_shortening())
         result['presence_at'] = int(self.presence_at())
         result['redirection_symbol'] = int(self.redirection_symbol())
+        
         result['hyphen_in_domain'] = int(self.hyphen_in_domain())
         result['too_many_subdomains'] = int(self.too_many_subdomains())
         result['https_in_string'] = int(self.https_in_string())
         result['ssl_tls_validity'] = int(self.ssl_tls_validity())
         result['domain_registration_length'] = int(self.domain_registration_length())
+        
         result['non_standard_ports'] = int(self.non_standard_ports())
         result['external_favicon'] = int(self.external_favicon())
         result['count_dots'] = int(self.count_dots())
         result['suspicious_chars'] = int(self.suspicious_chars())
-
         result['known_logo'] = int(self.known_logo())
+        
         result['use_script'] = int(self.use_script())
         result['count_third_party_domains'] = int(self.count_third_party_domains())
         result['use_meta'] = int(self.use_meta())
         result['script_external_ratio'] = int(self.script_external_ratio())
         result['use_form'] = int(self.use_form())
+        
         result['mailto'] = int(self.mailto())
-
         result['website_forwarding'] = int(self.website_forwarding())
         result['status_bar_customization'] = int(self.status_bar())
         result['right_click_disabled'] = int(self.right_click_disabled())
         result['popups'] = int(self.popups())
+        
         result['iframes'] = int(self.iframes())
         result['sensitive_forms'] = int(self.sensitive_forms())
-
         result['domain_age'] = int(self.domain_age())
         result['dns_record_count'] = int(self.dns_record())
-
         result['website_traffic_rank'] = int(self.traffic_rank())
+        
         result['page_ranking'] = int(self.page_ranking())
         result['google_index'] = int(self.google_index())
         result['backlinks'] = int(self.backlinks())
@@ -533,10 +535,9 @@ class PhishingFeatureExtractor:
         result['whois_suspicious_tokens'] = int(self.whois_suspicious_tokens())
 
         return result
-
-# -------------------------
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 # Single URL worker using full extractor
-# -------------------------
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 class SingleURLWorker(QThread):
     finished = Signal(dict)
     error = Signal(str)
@@ -594,7 +595,7 @@ class SingleURLWorker(QThread):
         except Exception as e:
             tb = traceback.format_exc()
             self.error.emit(f'Extraction/prediction error: {e}\n{tb}')
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 class SingleURLWorker(QThread):
     finished = Signal(dict)
     error = Signal(str)
@@ -604,7 +605,7 @@ class SingleURLWorker(QThread):
         super().__init__(parent)
         self.url = url
         self.model_path = model_path
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def run(self):
         try:
             self.progress.emit(5)
@@ -652,7 +653,7 @@ class SingleURLWorker(QThread):
         except Exception as e:
             tb = traceback.format_exc()
             self.error.emit(f'Extraction/prediction error: {e}\n{tb}')
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 class AnimatedButton(QPushButton):
     def __init__(self, icon_file, parent=None):
         super().__init__(parent)
@@ -672,21 +673,21 @@ class AnimatedButton(QPushButton):
         self.anim = QPropertyAnimation(self, b"iconSize")
         self.anim.setDuration(200)
         self.anim.setEasingCurve(QEasingCurve.OutQuad)
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def enterEvent(self, event):
         self.anim.stop()
         self.anim.setStartValue(self.iconSize())
         self.anim.setEndValue(QSize(240, 240))
         self.anim.start()
         super().enterEvent(event)
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def leaveEvent(self, event):
         self.anim.stop()
         self.anim.setStartValue(self.iconSize())
         self.anim.setEndValue(QSize(220, 220))
         self.anim.start()
         super().leaveEvent(event)
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -694,7 +695,7 @@ class MainWindow(QMainWindow):
         self.resize(1400, 900)  # Increased window size
         self.model_path = None
         self._build_ui()
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def _build_ui(self):
         central = QWidget()
         self.setCentralWidget(central)
@@ -789,7 +790,7 @@ class MainWindow(QMainWindow):
         palette.setColor(QPalette.Window, QColor(0, 150, 175))
         self.setAutoFillBackground(True)
         self.setPalette(palette)
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def create_app_card(self, icon_file, tagline, callback):
         card = QVBoxLayout()
         card.setSpacing(4)
@@ -810,7 +811,7 @@ class MainWindow(QMainWindow):
         card.addWidget(tagline_label)
         card.addSpacerItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding))
         return card
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def _make_stub_page(self, title, message):
         w = QWidget()
         v = QVBoxLayout()
@@ -825,7 +826,7 @@ class MainWindow(QMainWindow):
         v.addStretch()
         v.addWidget(back)
         return w
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def _make_phishing_page(self):
         w = QWidget()
         main_h = QHBoxLayout()
@@ -1008,7 +1009,7 @@ class MainWindow(QMainWindow):
         main_h.addLayout(right_v, 8)
 
         return w
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # --- Phishing callbacks (same as your original code) ---
     def _phish_load_csv(self):
         path, _ = QFileDialog.getOpenFileName(self, 'Open features CSV', '', 'CSV Files (*.csv);;All Files (*)')
@@ -1016,7 +1017,7 @@ class MainWindow(QMainWindow):
             return
         self.phish_features_csv = path
         self.phish_status.setText(f'Loaded CSV: {os.path.basename(path)}')
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def _phish_train(self):
         if not hasattr(self, 'phish_features_csv'):
             QMessageBox.information(self, 'Need CSV', 'Please load a features CSV first.')
@@ -1094,7 +1095,7 @@ class MainWindow(QMainWindow):
                 traceback.print_exc()
         t = threading.Thread(target=train_job, daemon=True)
         t.start()
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def _phish_load_model(self):
         path, _ = QFileDialog.getOpenFileName(self, 'Load model', '', 'Pickle Files (*.pkl *.joblib);;All Files (*)')
         if not path:
@@ -1108,7 +1109,7 @@ class MainWindow(QMainWindow):
             self.phish_status.setText(f'Loaded model: {os.path.basename(path)}')
         except Exception as e:
             QMessageBox.critical(self, 'Load error', f'Failed to load: {e}')
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def _phish_predict_csv(self):
         if not self.model_path:
             QMessageBox.information(self, 'No model', 'Load or train a model first.')
@@ -1147,7 +1148,7 @@ class MainWindow(QMainWindow):
             QMessageBox.information(self, 'Saved', f'Predictions saved to {outpath}')
         except Exception as e:
             QMessageBox.critical(self, 'Predict error', f"{e}\n{traceback.format_exc()}")
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def _phish_single_url(self):
         url = self.url_input.text().strip()
         if not url:
@@ -1159,7 +1160,7 @@ class MainWindow(QMainWindow):
         self.worker.finished.connect(self._on_single_result)
         self.phish_status.setText("Extracting & predicting...")
         self.worker.start()
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def _on_single_result(self, out: dict):
         feats = out.get('features', {})
         pred = out.get('prediction')
@@ -1194,7 +1195,7 @@ class MainWindow(QMainWindow):
             else:
                 self.explain_text.setPlainText('(no feature importances available for the loaded model)')
         self.phish_status.setText('Done')
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # --- Add these methods to MainWindow ---
     def _phish_stop(self):
         # Stop the worker thread if running
@@ -1202,7 +1203,7 @@ class MainWindow(QMainWindow):
             self.worker.terminate()
             self.phish_status.setText("Stopped.")
             self.phish_progress.setValue(0)
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def _phish_clear(self):
         self.url_input.clear()
         self.icon_label.clear()
@@ -1211,7 +1212,7 @@ class MainWindow(QMainWindow):
         self.explain_text.clear()
         self.phish_status.clear()
         self.phish_progress.setValue(0)
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 def main():
     app = QApplication(sys.argv)
     win = MainWindow()
@@ -1222,3 +1223,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# ------------------------------------------------------------------------------------------------------------------------------------------ #

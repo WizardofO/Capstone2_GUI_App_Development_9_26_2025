@@ -12,12 +12,12 @@ Features:
 - Predict on a new CSV and save results
 """
 
-import os
-import sys
-import traceback
-import joblib
-import pandas as pd
-import numpy as np
+import os                                               # os is for file path handling
+import sys                                              # sys is for system functions like exiting the app         
+import traceback                                        # traceback is for error handling and debugging
+import joblib                                           # joblib is for saving and loading ML models            
+import pandas as pd                                     # pandas is for data manipulation and analysis
+import numpy as np                                      # numpy is for numerical operations
 
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
@@ -27,15 +27,15 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, Signal, QThread
 
 # ML imports
-from sklearn.ensemble import RandomForestClassifier, VotingClassifier
+from sklearn.ensemble import RandomForestClassifier, VotingClassifier                               # Selected Methods ensemble methods for classification
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
     roc_auc_score, confusion_matrix, classification_report
-)
-
+)                                                                                                   # sklearn is for machine learning algorithms and evaluation metrics
+# ------------------------------------------------------------------------------------------------------------------------------------------ #                                                                                                   
 # imbalanced-learn (SMOTE)
 try:
     from imblearn.over_sampling import SMOTE
@@ -43,42 +43,45 @@ try:
 except Exception:
     IMBLEARN_AVAILABLE = False
 
-# -------------------------
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 # Worker thread for training
-# -------------------------
-class TrainerThread(QThread):
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
+class TrainerThread(QThread):   
     progress = Signal(int)  # percent
     finished = Signal(dict, object)  # metrics dict, saved_model_path or None
     error = Signal(str)
-
-    def __init__(self, csv_path, model_out_path="best_phishing_model.pkl", random_state=42, parent=None):
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
+    #def __init__(self, csv_path, model_out_path="best_phishing_model.pkl", random_state=42, parent=None):   # default output path (add name for changes and updates) 42 is set because it's a common convention for reproducibility
+    def __init__(self, csv_path, model_out_path="best_phishing_model.pkl", random_state=17, parent=None):    # Osias Random state changed to 17
         super().__init__(parent)
         self.csv_path = csv_path
         self.model_out_path = model_out_path
         self.random_state = random_state
         self._stop = False
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def run(self):
         try:
-            self.progress.emit(5)
+            self.progress.emit(5)                                                                       # This code block is for loading the CSV file and preparing the data for training
             df = pd.read_csv(self.csv_path, encoding="utf-8")
             # find label column
-            label_col = next((c for c in ["label", "Label", "y"] if c in df.columns), None)
+            label_col = next((c for c in ["label", "Label", "y"] if c in df.columns), None)             # look for common label column names
             if label_col is None:
-                self.error.emit("No label column found in CSV (expected 'label').")
+                self.error.emit("No label column found in CSV (expected 'label').")                     # if not found, emit error and
                 return
-            # coerce label
-            df[label_col] = pd.to_numeric(df[label_col], errors="coerce")
-            df = df.dropna(subset=[label_col])
-            df[label_col] = df[label_col].astype(int)
-            self.progress.emit(10)
+            # coerce label                                                                              # coerce means invalids become NaN
+            df[label_col] = pd.to_numeric(df[label_col], errors="coerce")                               # convert label to numeric, invalids to NaN
+            df = df.dropna(subset=[label_col])                                                          # drop rows with NaN labels
+            df[label_col] = df[label_col].astype(int)                                                   # convert label to int                    
+            self.progress.emit(10)                                                                      # This code block is for preprocessing the data, handling missing values, and preparing it for model training
 
-            # keep numeric only
-            numeric = df.select_dtypes(include=[np.number]).copy()
-            if label_col not in numeric.columns:
-                numeric[label_col] = df[label_col]
+            # keep numeric ready of Machine learning only
+            numeric = df.select_dtypes(include=[np.number]).copy()                                      # select only numeric columns      
+            if label_col not in numeric.columns:                                                        # ensure label column is present                                        
+                numeric[label_col] = df[label_col]                                                      # if not, add it from original df      
+
             # drop constant columns
-            numeric = numeric.loc[:, numeric.nunique() > 1]
+            numeric = numeric.loc[:, numeric.nunique() > 1]                                             # this code
+
             X = numeric.drop(columns=[label_col])
             y = numeric[label_col]
             X = X.fillna(X.median())
@@ -173,9 +176,9 @@ class TrainerThread(QThread):
     def stop(self):
         self._stop = True
 
-# -------------------------
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 # Main Window
-# -------------------------
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -242,7 +245,7 @@ class MainWindow(QMainWindow):
         self.table = QTableWidget(0, 6)
         self.table.setHorizontalHeaderLabels(["Model", "Accuracy", "Precision", "Recall", "F1", "ROC_AUC"])
         v.addWidget(self.table)
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def on_load_csv(self):
         path, _ = QFileDialog.getOpenFileName(self, "Open features CSV", "", "CSV Files (*.csv);;All Files (*)")
         if not path:
@@ -253,7 +256,7 @@ class MainWindow(QMainWindow):
         self.btn_train.setEnabled(True)
         self.metrics_text.clear()
         self.table.setRowCount(0)
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def on_train(self):
         if not self.csv_path:
             QMessageBox.warning(self, "No CSV", "Load a features CSV first.")
@@ -272,10 +275,10 @@ class MainWindow(QMainWindow):
         self.status.setText("Training started...")
         self.progress.setValue(0)
         self.trainer.start()
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def on_progress(self, percent):
         self.progress.setValue(percent)
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def on_train_finished(self, results: dict, saved_model_path):
         self.status.setText(f"Training finished. Best model saved to {saved_model_path}")
         self.btn_train.setEnabled(True)
@@ -306,12 +309,12 @@ class MainWindow(QMainWindow):
             self.table.setItem(r, 4, QTableWidgetItem(f"{m.get('f1'):.4f}"))
             roc = m.get("roc_auc")
             self.table.setItem(r, 5, QTableWidgetItem(f"{roc:.4f}" if roc is not None else "N/A"))
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def on_train_error(self, msg):
         self.status.setText("Training failed")
         QMessageBox.critical(self, "Training error", msg)
         self.btn_train.setEnabled(True)
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def on_save_model(self):
         # Save the model to another location (copy)
         if not self.model_path or not os.path.exists(self.model_path):
@@ -326,7 +329,7 @@ class MainWindow(QMainWindow):
             QMessageBox.information(self, "Saved", f"Model copied to {dest}")
         except Exception as e:
             QMessageBox.critical(self, "Failed", f"Could not copy model: {e}")
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def on_load_model(self):
         path, _ = QFileDialog.getOpenFileName(self, "Load model (joblib .pkl)", "", "Pickle Files (*.pkl *.joblib);;All Files (*)")
         if not path:
@@ -344,7 +347,7 @@ class MainWindow(QMainWindow):
             self.status.setText(f"Model loaded: {os.path.basename(path)}")
         except Exception as e:
             QMessageBox.critical(self, "Load error", f"Failed to load model: {e}")
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def on_predict_csv(self):
         if not self.model_path or not os.path.exists(self.model_path):
             QMessageBox.warning(self, "No model", "No saved model available. Train first or load one.")
@@ -396,17 +399,19 @@ class MainWindow(QMainWindow):
         except Exception as e:
             QMessageBox.critical(self, "Prediction error", f"Error during prediction: {e}\n{traceback.format_exc()}")
 
-# -------------------------
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 # Run
-# -------------------------
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 def main():
     app = QApplication(sys.argv)
     win = MainWindow()
     win.show()
-    if not IMBLEARN_AVAILABLE:
+    if not IMBLEARN_AVAILABLE:          # imbalanced-learn (SMOTE) not available is used for handling class imbalance during training and if not present, we warn the user to install it.
         QMessageBox.warning(win, "imblearn not found",
                             "imbalanced-learn (SMOTE) not found. Install with:\n\npip install imbalanced-learn\n\nTraining will still run but without SMOTE balancing.")
     sys.exit(app.exec())
 
 if __name__ == "__main__":
     main()
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
+

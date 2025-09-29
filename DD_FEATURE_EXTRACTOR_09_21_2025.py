@@ -35,43 +35,43 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, Signal, QObject
 
 # Networking / parsing libs
-import requests
-import whois
-import tldextract
-import dns.resolver
-import hashlib
-from bs4 import BeautifulSoup
+import requests                                                     # requests is for HTTP requests                               
+import whois                                                        # whois is for domain WHOIS lookups
+import tldextract                                                   # tldextract is for domain parsing
+import dns.resolver                                                 # dns.resolver is for DNS lookups    
+import hashlib                                                      # hashlib is for hashing (logo detection)
+from bs4 import BeautifulSoup                                       # BeautifulSoup is for HTML parsing        
 
 # Optional API keys via environment
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-GOOGLE_CX = os.getenv("GOOGLE_CX")
-BING_API_KEY = os.getenv("BING_API_KEY")
-VT_API_KEY = os.getenv("VT_API_KEY")
-GSB_API_KEY = os.getenv("GSB_API_KEY")
-TRANC0_LOCAL = os.getenv("TRANCO_CSV_PATH", "tranco.csv")
-LOGO_HASH_FILE = os.getenv("LOGO_HASH_FILE", "logo_hashes.json")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")                        # Google Custom Search API key
+GOOGLE_CX = os.getenv("GOOGLE_CX")                                  # Google Custom Search Engine ID
+BING_API_KEY = os.getenv("BING_API_KEY")                            # Bing Search API key
+VT_API_KEY = os.getenv("VT_API_KEY")                                # VirusTotal API key
+GSB_API_KEY = os.getenv("GSB_API_KEY")                              # Google Safe Browsing API key
+TRANC0_LOCAL = os.getenv("TRANCO_CSV_PATH", "tranco.csv")           # Local Tranco CSV file path (optional)
+LOGO_HASH_FILE = os.getenv("LOGO_HASH_FILE", "logo_hashes.json")    # Local logo hashes JSON file path (optional)
 
-REQUESTS_TIMEOUT = 10
+REQUESTS_TIMEOUT = 10                                               # Requests timeout in seconds is for network operations used to fetch HTML, WHOIS, DNS, APIs and the 10 is a reasonable timeout for network operations.
 
 # -------------------------
 # Core extractor (complete 35 features)
 # Included inline so GUI is self-contained.
 # -------------------------
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 def safe_requests_get(url, **kwargs):
     try:
         return requests.get(url, timeout=REQUESTS_TIMEOUT, **kwargs)
     except Exception:
         return None
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 def md5_bytes(data: bytes) -> str:
     return hashlib.md5(data).hexdigest()
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 def normalize_domain(hostname: str) -> str:
     if not hostname:
         return ""
     return hostname.lower().strip().lstrip("www.")
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 class PhishingFeatureExtractor:
     def __init__(self, url: str = None, html_content: str = None, file_mode: bool = False):
         self.url = url
@@ -101,7 +101,7 @@ class PhishingFeatureExtractor:
                         self.known_logo_hashes = set(data)
         except Exception:
             self.known_logo_hashes = set()
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def fetch_html(self) -> str:
         if not self.url:
             return ""
@@ -111,53 +111,53 @@ class PhishingFeatureExtractor:
             return r.text or ""
         except Exception:
             return ""
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 1
     def ip_in_url(self) -> int:
         if not self.url:
             return 0
         return 1 if re.match(r"^https?://\d{1,3}(?:\.\d{1,3}){3}", self.url) else 0
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 2
     def url_length(self) -> int:
         return len(self.url) if self.url else 0
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 3
     def url_shortening(self) -> int:
         if not self.domain:
             return 0
         shorteners = {"bit.ly", "tinyurl.com", "t.co", "goo.gl", "is.gd", "buff.ly", "ow.ly", "rb.gy"}
         return 1 if any(s in self.domain for s in shorteners) else 0
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 4
     def presence_at(self) -> int:
         return (self.url.count("@") if self.url else 0)
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 5
     def redirection_symbol(self) -> int:
         if not self.url:
             return 0
         total = self.url.count("//")
         return max(0, total - 1)
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 6
     def hyphen_in_domain(self) -> int:
         return self.domain.count("-") if self.domain else 0
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 7
     def too_many_subdomains(self) -> int:
         sub = self.ext.subdomain if self.ext else ""
         if not sub:
             return 0
         return sub.count(".") + 1
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 8
     def https_in_string(self) -> int:
         if not self.url:
             return 0
         path_and_query = (self.parsed.path or "") + (self.parsed.query or "")
         return path_and_query.lower().count("https") + (self.html.lower().count("https") if self.html else 0)
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 9
     def ssl_tls_validity(self) -> int:
         if not self.url:
@@ -171,7 +171,7 @@ class PhishingFeatureExtractor:
             return 1
         except Exception:
             return 0
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 10
     def domain_registration_length(self) -> int:
         if not self.domain:
@@ -191,7 +191,7 @@ class PhishingFeatureExtractor:
             return max(0, (exp - cre).days)
         except Exception:
             return 0
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 11
     def non_standard_ports(self) -> int:
         if not self.parsed:
@@ -200,7 +200,7 @@ class PhishingFeatureExtractor:
         if port is None:
             return 0
         return 1 if port not in (80, 443) else 0
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 12
     def external_favicon(self) -> int:
         try:
@@ -220,17 +220,17 @@ class PhishingFeatureExtractor:
             return 1 if normalize_domain(p.hostname) != self.domain else 0
         except Exception:
             return 0
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 13
     def count_dots(self) -> int:
         return self.url.count(".") if self.url else 0
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 14
     def suspicious_chars(self) -> int:
         if not self.url:
             return 0
         return sum(self.url.count(c) for c in ["?", "%", "&", "=", "+"])
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 15
     def known_logo(self) -> int:
         if not self.soup or not self.known_logo_hashes:
@@ -254,11 +254,11 @@ class PhishingFeatureExtractor:
             except Exception:
                 continue
         return 0
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 16
     def use_script(self) -> int:
         return len(self.soup.find_all("script")) if self.soup else 0
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 17
     def count_third_party_domains(self) -> int:
         if not self.soup:
@@ -273,11 +273,11 @@ class PhishingFeatureExtractor:
             if host and host != self.domain:
                 domains.add(host)
         return len(domains)
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 18
     def use_meta(self) -> int:
         return len(self.soup.find_all("meta")) if self.soup else 0
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 19
     def script_external_ratio(self) -> int:
         if not self.soup:
@@ -287,17 +287,17 @@ class PhishingFeatureExtractor:
             return 0
         ext = sum(1 for s in scripts if s.get("src"))
         return int((ext / len(scripts)) * 100)
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 20
     def use_form(self) -> int:
         return len(self.soup.find_all("form")) if self.soup else 0
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 21
     def mailto(self) -> int:
         if not self.html:
             return 0
         return self.html.lower().count("mailto:")
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 22
     def website_forwarding(self) -> int:
         if not self.soup:
@@ -308,34 +308,34 @@ class PhishingFeatureExtractor:
         if "location.replace(" in txt or "window.location" in txt:
             return 1
         return 0
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 23
     def status_bar(self) -> int:
         txt = (self.html or "").lower()
         return int(bool(re.search(r"window\.status|history\.replaceState|pushState\(|onbeforeunload", txt)))
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 24
     def right_click_disabled(self) -> int:
         txt = (self.html or "").lower()
         if 'oncontextmenu="return false"' in txt or re.search(r"addEventListener\(['\"]contextmenu['\"],", txt):
             return 1
         return 0
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 25
     def popups(self) -> int:
         txt = (self.html or "").lower()
         return len(re.findall(r"window\.open\(", txt))
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 26
     def iframes(self) -> int:
         return len(self.soup.find_all("iframe")) if self.soup else 0
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 27
     def sensitive_forms(self) -> int:
         sensitive_keywords = ["password", "pass", "cardnumber", "creditcard", "card", "cvv", "cvc", "ssn", "socialsecurity"]
         txt = (self.html or "").lower()
         return sum(txt.count(k) for k in sensitive_keywords)
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 28
     def domain_age(self) -> int:
         if not self.domain:
@@ -358,7 +358,7 @@ class PhishingFeatureExtractor:
             return max(0, (datetime.utcnow() - cre).days)
         except Exception:
             return 0
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 29
     def dns_record(self) -> int:
         if not self.domain:
@@ -374,7 +374,7 @@ class PhishingFeatureExtractor:
         except Exception:
             pass
         return total
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 30
     def traffic_rank(self) -> int:
         try:
@@ -405,11 +405,11 @@ class PhishingFeatureExtractor:
         except Exception:
             pass
         return 0
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 31
     def page_ranking(self) -> int:
         return self.backlinks()
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 32
     def google_index(self) -> int:
         if not GOOGLE_API_KEY or not GOOGLE_CX or not self.domain:
@@ -426,7 +426,7 @@ class PhishingFeatureExtractor:
             return int(total)
         except Exception:
             return 0
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 33
     def backlinks(self) -> int:
         if not BING_API_KEY or not self.domain:
@@ -442,7 +442,7 @@ class PhishingFeatureExtractor:
             return len(results)
         except Exception:
             return 0
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 34
     def blacklist(self) -> int:
         total_flags = 0
@@ -476,7 +476,7 @@ class PhishingFeatureExtractor:
             except Exception:
                 pass
         return total_flags
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 35
     def whois_suspicious_tokens(self) -> int:
         if not self.domain:
@@ -494,7 +494,7 @@ class PhishingFeatureExtractor:
             return count
         except Exception:
             return 0
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def extract_all(self) -> dict:
         result = {}
         result["ip_in_url"] = int(self.ip_in_url())
@@ -539,9 +539,9 @@ class PhishingFeatureExtractor:
 
         return result
 
-# -------------------------
-# GUI helpers & worker signalling
-# -------------------------
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
+#                                                        GUI helpers & worker signalling
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 
 class WorkerSignals(QObject):
     row_done = Signal(int, dict, str)   # index, features dict, error string
@@ -560,7 +560,7 @@ class BatchWorker:
         self.signals = signals or WorkerSignals()
         self._stop_event = threading.Event()
         self._executor = None
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def stop(self):
         self._stop_event.set()
         if self._executor:
@@ -568,7 +568,7 @@ class BatchWorker:
                 self._executor.shutdown(wait=False)
             except Exception:
                 pass
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def run(self):
         total = len(self.rows)
         done = 0
@@ -606,7 +606,7 @@ class BatchWorker:
                 pass
             if self.signals:
                 self.signals.finished.emit()
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def _process_single(self, index, input_str, label):
         err = ""
         try:
@@ -629,9 +629,9 @@ class BatchWorker:
         except Exception as e:
             return {}, f"exception: {e}\\n{traceback.format_exc()}"
 
-# -------------------------
-# Main Window
-# -------------------------
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
+#                                                               Main Window
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -646,7 +646,7 @@ class MainWindow(QMainWindow):
 
         # UI
         self._build_ui()
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def _build_ui(self):
         w = QWidget()
         self.setCentralWidget(w)
@@ -710,7 +710,7 @@ class MainWindow(QMainWindow):
         columns = ["input", "label"] + self.feature_keys
         self.table.setColumnCount(len(columns))
         self.table.setHorizontalHeaderLabels(columns)
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # UI slots
     def on_add_csv(self):
         path, _ = QFileDialog.getOpenFileName(self, "Open CSV file", "", "CSV Files (*.csv);;All Files (*)")
@@ -735,7 +735,7 @@ class MainWindow(QMainWindow):
             return
         self.statusbar.setText(f"Loaded {added} rows from {os.path.basename(path)}")
         self._refresh_table()
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def on_clear(self):
         if self.worker:
             QMessageBox.warning(self, "Warning", "Stop current extraction first.")
@@ -744,7 +744,7 @@ class MainWindow(QMainWindow):
         self.results = {}
         self._refresh_table()
         self.statusbar.setText("Cleared")
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def on_start(self):
         if not self.rows:
             QMessageBox.information(self, "No rows", "Please add a CSV first.")
@@ -767,14 +767,14 @@ class MainWindow(QMainWindow):
         self.worker_thread.start()
         self.statusbar.setText("Extraction started")
         self.btn_start.setEnabled(False)
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def on_stop(self):
         if not self.worker:
             self.statusbar.setText("No active extraction")
             return
         self.worker.stop()
         self.statusbar.setText("Stop requested")
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def on_save_csv(self):
         if not self.results:
             QMessageBox.information(self, "No data", "No results to save.")
@@ -800,7 +800,7 @@ class MainWindow(QMainWindow):
             self.statusbar.setText(f"Saved CSV: {path}")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to save CSV: {e}")
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def on_save_json(self):
         if not self.results:
             QMessageBox.information(self, "No data", "No results to save.")
@@ -823,7 +823,7 @@ class MainWindow(QMainWindow):
             self.statusbar.setText(f"Saved JSON: {path}")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to save JSON: {e}")
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     # worker signal handlers
     def on_row_done(self, idx, features, err):
         # store result and update table row
@@ -847,18 +847,18 @@ class MainWindow(QMainWindow):
             val = features.get(key, "")
             it = QTableWidgetItem(str(val))
             self.table.setItem(rowpos, col_i, it)
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def on_progress(self, done, total):
         self.progress.setMaximum(total)
         self.progress.setValue(done)
         self.statusbar.setText(f"Progress: {done}/{total}")
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def on_finished(self):
         self.statusbar.setText("Extraction finished")
         self.btn_start.setEnabled(True)
         self.worker = None
         self.worker_thread = None
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
     def _refresh_table(self):
         n = len(self.rows)
         self.table.setRowCount(n)
@@ -871,9 +871,9 @@ class MainWindow(QMainWindow):
             for c in range(2, self.table.columnCount()):
                 self.table.setItem(r, c, QTableWidgetItem(""))
 
-# -------------------------
-# Run app
-# -------------------------
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
+# Run app the MAIN app
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 def main():
     app = QApplication(sys.argv)
     win = MainWindow()
@@ -882,3 +882,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+# ---------------------------------------------------end of code --------------------------------------------------------------------------- #
