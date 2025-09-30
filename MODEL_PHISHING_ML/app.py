@@ -1,17 +1,17 @@
 # MOIT-200 CAPSTONE2_TITLE: Signature-Based Analysis of Open-Source Phishing Toolkits for Machine Learning-Based Detection "A Case Study Using BlackEye and Zphisher and other sites"
 # Author: Osias Nieva 
-
-from flask import Flask, request, jsonify
-import traceback
-import os
-import joblib
-import sys
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
+from flask import Flask, request, jsonify                   # Flask web server was used to create a simple API for the phishing detection model.
+import traceback                                            # For error handling and debugging.
+import os                                                   # For file path manipulations.                  
+import joblib                                               # For loading the pre-trained ML model.
+import sys                                                  # For system-specific parameters and functions.                     
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from DD_FEATURE_EXTRACTOR_09_21_2025 import PhishingFeatureExtractor
+from DD_FEATURE_EXTRACTOR_09_21_2025 import PhishingFeatureExtractor    # From ORIGINAL FEATURE EXTRACTOR using Custom feature extractor for phishing detection imported from a separate module.
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
+app = Flask(__name__)                                       # Initialize the Flask application.
 
-app = Flask(__name__)
-
-MODEL_PATH = os.path.join(os.path.dirname(__file__), 'best_phishing_model_08.pkl')
+MODEL_PATH = os.path.join(os.path.dirname(__file__), 'best_phishing_model_08.pkl')      # Path to the pre-trained model file.
 
 # Load the model using joblib
 try:
@@ -26,16 +26,17 @@ except Exception as e:
     model = None
     app.logger.error("Failed to load model: %s", e)
     traceback.print_exc()
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 
 @app.route('/ping', methods=['GET'])
 def ping():
-    return jsonify({'status':'ok', 'model_loaded': model is not None})
-
+    return jsonify({'status':'ok', 'Osias your model is loaded already': model is not None})
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 def extract_features(url, feature_keys):
     extractor = PhishingFeatureExtractor(url=url)
     features_dict = extractor.extract_all()
     return [[features_dict.get(k, 0) for k in feature_keys]]
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 # Example usage:
 # For a model trained on 23 features
 features_23 = [
@@ -45,7 +46,7 @@ features_23 = [
     "suspicious_chars", "known_logo", "use_script", "count_third_party_domains", "use_meta",
     "script_external_ratio", "use_form", "mailto", "website_forwarding", "status_bar_customization"
 ]
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 # For a model trained on 35 features
 features_35 = [
     "ip_in_url", "url_length", "url_shortening", "presence_at", "redirection_symbol",
@@ -56,7 +57,7 @@ features_35 = [
     "right_click_disabled", "popups", "iframes", "sensitive_forms", "domain_age", "dns_record_count",
     "website_traffic_rank", "page_ranking", "google_index", "backlinks", "blacklist", "whois_suspicious_tokens"
 ]
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 @app.route('/predict', methods=['POST'])
 def predict():
     if model is None:
@@ -79,7 +80,8 @@ def predict():
         label = str(pred[0])
 
         # Threshold for verdict (adjust as needed, e.g., 0.5)
-        threshold = 0.5
+        #threshold = 0.50
+        threshold = 0.10
         if label == "1" or (proba is not None and proba >= threshold):
             verdict = "PHISHING"
             verdict_text = "PHISHING"

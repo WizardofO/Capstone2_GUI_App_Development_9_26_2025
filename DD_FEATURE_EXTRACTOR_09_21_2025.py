@@ -53,10 +53,9 @@ LOGO_HASH_FILE = os.getenv("LOGO_HASH_FILE", "logo_hashes.json")    # Local logo
 
 REQUESTS_TIMEOUT = 10                                               # Requests timeout in seconds is for network operations used to fetch HTML, WHOIS, DNS, APIs and the 10 is a reasonable timeout for network operations.
 
-# -------------------------
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 # Core extractor (complete 35 features)
 # Included inline so GUI is self-contained.
-# -------------------------
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 def safe_requests_get(url, **kwargs):
     try:

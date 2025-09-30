@@ -9,6 +9,7 @@ import threading
 from datetime import datetime
 from urllib.parse import urlparse, urljoin
 
+#PYSIDE6 Libraries
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QFileDialog, QLabel, QTextEdit, QProgressBar, QMessageBox,
@@ -18,7 +19,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, Signal, QThread, QSize, QPropertyAnimation, QEasingCurve
 from PySide6.QtGui import QFont, QPalette, QColor, QIcon
 from PySide6.QtWidgets import QGraphicsDropShadowEffect
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 # ML libs
 import pandas as pd
 import numpy as np
@@ -28,19 +29,21 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 
 # optional SMOTE
 try:
-    from imblearn.over_sampling import SMOTE
+    from imblearn.over_sampling import SMOTE                # SMOTE was use to handle imbalanced datasets during model training
     IMBLEARN_AVAILABLE = True
 except Exception:
     IMBLEARN_AVAILABLE = False
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 
 # networking/parsing
-import requests
-import whois
-import tldextract
-import dns.resolver
+import requests                                             # requests is used to fetch HTML content and perform network operations
+import whois                                                # whois is used to retrieve domain registration information
+import tldextract                                           # tldextract is used to parse domain components
+import dns.resolver                                         # dnspython is used to perform DNS queries           
 import hashlib
 from bs4 import BeautifulSoup
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -696,7 +699,7 @@ class MainWindow(QMainWindow):
         self.model_path = None
         self._build_ui()
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-    def _build_ui(self):
+    def _build_ui(self):                                            # MMDC LOGO, TITLE, VERSION, MY LOGO @ TOP LEFT
         central = QWidget()
         self.setCentralWidget(central)
         main_layout = QVBoxLayout()
@@ -705,7 +708,7 @@ class MainWindow(QMainWindow):
         # --- Top bar with MMDC logo and TITLE ---
         top_bar = QHBoxLayout()
         mmdc_logo = QLabel()
-        mmdc_logo.setPixmap(QIcon("mmdc.png").pixmap(250, 80))
+        mmdc_logo.setPixmap(QIcon("mmdc.png").pixmap(250, 80))      # MMDC LOGO IMAGE
         mmdc_logo.setScaledContents(True)
         top_bar.addWidget(mmdc_logo, alignment=Qt.AlignLeft)
 
@@ -755,9 +758,9 @@ class MainWindow(QMainWindow):
 
         # --- Disclaimer ---
         bottom_text2 = QLabel(
-            "Application Designed by: Osias Nieva Jr. for MMDC-Capstone 2 2025-2026\n email: lr.onieva@mmdc.mcl.edu.ph"
+            "Application Designed by: Osias Nieva Jr. for MMDC-Capstone 2_2025-2026\n email: lr.onieva@mmdc.mcl.edu.ph"
         )
-        bottom_text2.setFont(QFont("Arial", 9))
+        bottom_text2.setFont(QFont("Arial", 9,QFont.Bold))
         bottom_text2.setAlignment(Qt.AlignCenter)
         bottom_text2.setStyleSheet("color: white; margin-top: 30px;")
         disclaimer = QLabel(
