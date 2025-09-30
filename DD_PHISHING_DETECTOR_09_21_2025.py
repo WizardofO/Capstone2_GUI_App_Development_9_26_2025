@@ -699,20 +699,21 @@ class MainWindow(QMainWindow):
         self.model_path = None
         self._build_ui()
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-    def _build_ui(self):                                            # MMDC LOGO, TITLE, VERSION, MY LOGO @ TOP LEFT
+    def _build_ui(self):                                                    # MMDC LOGO, TITLE, VERSION, MY LOGO @ TOP LEFT
         central = QWidget()
         self.setCentralWidget(central)
         main_layout = QVBoxLayout()
         central.setLayout(main_layout)
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
         # --- Top bar with MMDC logo and TITLE ---
         top_bar = QHBoxLayout()
         mmdc_logo = QLabel()
-        mmdc_logo.setPixmap(QIcon("mmdc.png").pixmap(250, 80))      # MMDC LOGO IMAGE
+        mmdc_logo.setPixmap(QIcon("mmdc.png").pixmap(250, 80))              # MMDC LOGO IMAGE
         mmdc_logo.setScaledContents(True)
         top_bar.addWidget(mmdc_logo, alignment=Qt.AlignLeft)
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
 
-        # TITLE centered next to logo
+        # TITLE centered next to logo                                       # Top CENTER TITLE TEXT
         title_label = QLabel(
             "TITLE: Signature-Based Analysis of Open-Source Phishing Toolkits\n"
             "for Machine Learning-Based Detection\n"
@@ -722,7 +723,7 @@ class MainWindow(QMainWindow):
         title_label.setAlignment(Qt.AlignCenter)
         title_label.setStyleSheet("color: white; margin-top: 10px; margin-bottom: 10px;")
         top_bar.addWidget(title_label, stretch=2)
-
+# ------------------------------------------------------------------------------------------------------------------------------------------ #
         # Right-side logos
         right_layout = QVBoxLayout()
         logo_row = QHBoxLayout()
