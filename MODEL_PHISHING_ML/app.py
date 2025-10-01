@@ -1,5 +1,5 @@
 # MOIT-200 CAPSTONE2_TITLE: Signature-Based Analysis of Open-Source Phishing Toolkits for Machine Learning-Based Detection "A Case Study Using BlackEye and Zphisher and other sites"
-# Author: Osias Nieva 
+# Author: Osias Nieva Jr.
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 from flask import Flask, request, jsonify                   # Flask web server was used to create a simple API for the phishing detection model.
 import traceback                                            # For error handling and debugging.
@@ -11,7 +11,7 @@ from DD_FEATURE_EXTRACTOR_09_21_2025 import PhishingFeatureExtractor    # From O
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 app = Flask(__name__)                                       # Initialize the Flask application.
 
-#MODEL_PATH = os.path.join(os.path.dirname(__file__), 'best_phishing_model_08.pkl')      # Path to the pre-trained model file.
+#MODEL_PATH = os.path.join(os.path.dirname(__file__), 'best_phishing_model_08.pkl')                    # Path to my old pre-trained model file.
 MODEL_PATH = os.path.join(os.path.dirname(__file__), 'best_phishing_model_14_Balanced Model.pkl')      # Path to the pre-trained model file.
 
 # Load the model using joblib
@@ -96,7 +96,8 @@ def predict():
         label = str(pred[0])
 
         # Balanced prediction logic: use both probability and class_weight if available
-        balanced_threshold = 0.5
+        # balanced_threshold = 0.10 
+        balanced_threshold = 0.5            # (SOLUTION FOR THE ISSUE of imbalanced dataset)
         class_weight = getattr(model, 'class_weight', None)
         if class_weight and isinstance(class_weight, dict):
             w0 = class_weight.get(0, 1)
