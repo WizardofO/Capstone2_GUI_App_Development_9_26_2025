@@ -28,9 +28,9 @@ from PySide6.QtCore import Qt, Signal, QThread
 
 # ML imports
 from sklearn.ensemble import RandomForestClassifier, VotingClassifier                               # Selected Methods ensemble methods for classification
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeClassifier                                                     # 
 from sklearn.naive_bayes import GaussianNB
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler        
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
     roc_auc_score, confusion_matrix, classification_report
@@ -42,6 +42,14 @@ try:
     IMBLEARN_AVAILABLE = True
 except Exception:
     IMBLEARN_AVAILABLE = False
+""" SMOTE (Synthetic Minority Over-sampling Technique)
+Benefits of Using SMOTE:
+Addresses Class Imbalance: SMOTE directly tackles the issue of imbalanced datasets, preventing models from being overly biased towards the majority class.
+Improves Model Performance: By providing more representative data for the minority class, SMOTE can lead to improved predictive performance, especially in terms of recall and F1-score for the minority class.
+Reduces Overfitting: Unlike simple oversampling techniques that just duplicate existing samples, SMOTE creates synthetic samples, which can help reduce overfitting to the original minority class instances.
+Applicable to Various Data Types: SMOTE can be applied to datasets with both continuous and categorical features, although variations like SMOTE-NC 
+(for nominal and continuous features) exist for handling mixed data types more effectively.
+"""
 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # Worker thread for training
@@ -80,7 +88,7 @@ class TrainerThread(QThread):
                 numeric[label_col] = df[label_col]                                                      # if not, add it from original df      
 
             # drop constant columns
-            numeric = numeric.loc[:, numeric.nunique() > 1]                                             # this code
+            numeric = numeric.loc[:, numeric.nunique() > 1]                                             # this code is for dropping constant columns
 
             X = numeric.drop(columns=[label_col])
             y = numeric[label_col]
@@ -94,13 +102,20 @@ class TrainerThread(QThread):
             )
             self.progress.emit(30)
 
-            # handle imbalance with SMOTE if available
+            # to handle imbalance with SMOTE if available  
+            imbalance_ratio = y_train.value_counts(normalize=True)
+            min_class = imbalance_ratio.idxmin()
+            max_class = imbalance_ratio.idxmax()
+            ratio = imbalance_ratio[min_class] / imbalance_ratio[max_class] if imbalance_ratio[max_class] > 0 else 0
+            warn_imbalance = False
             if IMBLEARN_AVAILABLE:
                 smote = SMOTE(random_state=self.random_state)
                 X_train_bal, y_train_bal = smote.fit_resample(X_train, y_train)
             else:
-                # fallback: use original training set but we warn the user
+                # fallback: use original training set but we warn the user if imbalance is severe
                 X_train_bal, y_train_bal = X_train, y_train
+                if ratio < 0.5:
+                    warn_imbalance = True
 
             self.progress.emit(45)
 
@@ -109,7 +124,7 @@ class TrainerThread(QThread):
             X_train_s = scaler.fit_transform(X_train_bal)
             X_test_s = scaler.transform(X_test)
 
-            # prepare models
+            # prepare models with class_weight for supported classifiers
             rf = RandomForestClassifier(n_estimators=100, random_state=self.random_state, class_weight="balanced")
             dt = DecisionTreeClassifier(random_state=self.random_state, class_weight="balanced")
             nb = GaussianNB()
@@ -165,8 +180,12 @@ class TrainerThread(QThread):
                 "label_col": label_col
             }
             joblib.dump(to_save, self.model_out_path)
+
             self.progress.emit(100)
 
+            # Warn user if imbalance is detected and SMOTE is not available
+            if warn_imbalance:
+                self.error.emit("Warning: Severe class imbalance detected and SMOTE is not available. Results may be biased. Install imbalanced-learn for better balancing.")
             self.finished.emit(results, os.path.abspath(self.model_out_path))
 
         except Exception as e:
@@ -182,7 +201,7 @@ class TrainerThread(QThread):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Phishing Model Pipeline (GUI)")
+        self.setWindowTitle("Phishing Model Pipeline Training GUI - Capstione2 by Osias Nieva Jr")
         self.resize(1000, 700)
 
         self.csv_path = None
@@ -290,7 +309,7 @@ class MainWindow(QMainWindow):
         self.metrics_text.clear()
         self.table.setRowCount(0)
         for name, m in results.items():
-            self.metrics_text.append(f"=== {name} ===")
+            self.metrics_text.append(f"====================== {name} ======================")
             for k in ("accuracy", "precision", "recall", "f1", "roc_auc"):
                 self.metrics_text.append(f"{k}: {m.get(k)}")
             self.metrics_text.append("confusion_matrix:")

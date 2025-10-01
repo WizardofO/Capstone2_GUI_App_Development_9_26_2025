@@ -59,6 +59,7 @@ def safe_requests_get(url, **kwargs):
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 def md5_bytes(data: bytes) -> str:
     return hashlib.md5(data).hexdigest()
+
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 def normalize_domain(hostname: str) -> str:
     if not hostname:
@@ -121,6 +122,9 @@ class PhishingFeatureExtractor:
             return 0
         shorteners = {'bit.ly', 'tinyurl.com', 't.co', 'goo.gl', 'is.gd', 'buff.ly', 'ow.ly', 'rb.gy'}
         return 1 if any(s in self.domain for s in shorteners) else 0
+    
+    # Le Page, S., Jourdan, G.-V., v. Bochmann, G., Flood, J., & Onut, I.-V. (2018). Using URL Shorteners to Compare Phishing and Malware Attacks 
+    # (Paper presented at eCrime Research 2018). Retrieved from https://docs.apwg.org/ecrimeresearch/2018/5351273.pdf
 
     # 4
     def presence_at(self) -> int:
@@ -577,7 +581,7 @@ class SingleURLWorker(QThread):
                 except Exception:
                     feed = X_arr
 
-            pred = int(model.predict(feed)[0])
+            pred = int(model.predict(feed)[0])                  # PHISHING PROBABILITY COMPUTATION AREA 
             try:
                 prob = float(model.predict_proba(feed)[0][1])
             except Exception:
@@ -994,6 +998,7 @@ class MainWindow(QMainWindow):
         mid_box.addWidget(self.features_table)
         result_h.addLayout(mid_box, 4)
         right_box = QVBoxLayout()
+
         explain_label = QLabel('Explainability (top features)')
         explain_label.setFont(QFont("Arial", 12, QFont.Bold))
         right_box.addWidget(explain_label, alignment=Qt.AlignLeft)
@@ -1061,6 +1066,7 @@ class MainWindow(QMainWindow):
                 dt = DecisionTreeClassifier(random_state=42, class_weight='balanced')
                 nb = GaussianNB()
                 voting = VotingClassifier([('rf', rf), ('dt', dt)], voting='hard')
+
                 models = {
                     'RandomForest': (rf, X_train_bal, X_test),
                     'DecisionTree': (dt, X_train_bal, X_test),
@@ -1070,6 +1076,7 @@ class MainWindow(QMainWindow):
                 results = {}
                 total = len(models)
                 i = 0
+
                 for name, (model, Xt_train, Xt_test) in models.items():
                     i += 1
                     self.phish_progress.setValue(10 + int(70 * (i/total)))

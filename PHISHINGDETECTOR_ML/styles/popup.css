@@ -1,9 +1,9 @@
 body {
     font-family: Arial, sans-serif;
-    min-width: 420px;
-    min-height: 340px;
+    min-width: 520px;
+    min-height: 440px;
     margin: 0;
-    padding: 16px;
+    padding: 24px;
     background: #e3f2fd; /* light blue */
 }
 
@@ -66,4 +66,18 @@ body {
     font-size: 1em;
     color: #1976d2;
     font-weight: bold;
+}
+
+.footer-text2 {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 1em;
+    color: #1976d2;
+    font-weight: bold;
+}
+.footer-text3, .footer-text4, .footer-text5 {
+    text-align: center;
+    font-size: 0.85em;
+    color: #1976d2;
+    font-weight: normal;
 }

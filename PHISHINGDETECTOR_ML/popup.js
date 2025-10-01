@@ -20,12 +20,13 @@ document.getElementById('detectBtn').addEventListener('click', async () => {
         if (response.ok) {
             const score = data.score !== null ? data.score.toFixed(2) : "N/A";
             let verdictColor = data.verdict === "PHISHING" ? "#d32f2f" : "#1976d2";
-            let verdictEmoji = data.verdict === "PHISHING" ? "❌" : "✅";
+            // Correct icon: LEGITIMATE=✔️, PHISHING=❌
+            let verdictIcon = data.verdict_icon || (data.verdict === "PHISHING" ? "❌" : "✔️");
             resultDiv.innerHTML = `
-                <div style="font-size:2em;font-weight:bold;color:${verdictColor};margin-bottom:8px;">
-                    ${verdictEmoji} ${data.verdict_text}
+                <div style=\"font-size:2.6em;font-weight:bold;color:${verdictColor};margin-bottom:8px;\">
+                    ${verdictIcon} <span style=\"font-size:1.1em;\">${data.verdict_text}</span>
                 </div>
-                <div style="font-size:1.3em;color:#333;">
+                <div style=\"font-size:1.5em;color:#333;\">
                     Phishing Probability: <b>${score}</b>
                 </div>
             `;

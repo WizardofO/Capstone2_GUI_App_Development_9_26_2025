@@ -59,12 +59,12 @@ REQUESTS_TIMEOUT = 10                                               # Requests t
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 def safe_requests_get(url, **kwargs):
     try:
-        return requests.get(url, timeout=REQUESTS_TIMEOUT, **kwargs)
+        return requests.get(url, timeout=REQUESTS_TIMEOUT, **kwargs)# output here is response from getting the url
     except Exception:
-        return None
+        return None                                                     
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 def md5_bytes(data: bytes) -> str:
-    return hashlib.md5(data).hexdigest()
+    return hashlib.md5(data).hexdigest()                            # output here is the hexadecimal digest of the hash
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 def normalize_domain(hostname: str) -> str:
     if not hostname:
@@ -115,11 +115,11 @@ class PhishingFeatureExtractor:
     def ip_in_url(self) -> int:
         if not self.url:
             return 0
-        return 1 if re.match(r"^https?://\d{1,3}(?:\.\d{1,3}){3}", self.url) else 0
+        return 1 if re.match(r"^https?://\d{1,3}(?:\.\d{1,3}){3}", self.url) else 0     # output here is 1 if theres an IP in the URL
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 2
     def url_length(self) -> int:
-        return len(self.url) if self.url else 0
+        return len(self.url) if self.url else 0                                         # output here is the length of the URL
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 3
     def url_shortening(self) -> int:
@@ -316,7 +316,24 @@ class PhishingFeatureExtractor:
     # 24
     def right_click_disabled(self) -> int:
         txt = (self.html or "").lower()
-        if 'oncontextmenu="return false"' in txt or re.search(r"addEventListener\(['\"]contextmenu['\"],", txt):
+        # Check for inline disabling
+        if 'oncontextmenu="return false"' in txt or "oncontextmenu='return false'" in txt:
+            return 1
+        # Check for addEventListener or attachEvent
+        if re.search(r"addEventListener\(['\"]contextmenu['\"],", txt):
+            return 1
+        if re.search(r"attachEvent\(['\"]oncontextmenu['\"],", txt):
+            return 1
+        # Check for jQuery style
+        if re.search(r"\.on\(['\"]contextmenu['\"],", txt):
+            return 1
+        # Check for body or html tag disabling
+        if self.soup:
+            for tag in self.soup.find_all(["body", "html"]):
+                if tag.has_attr("oncontextmenu") and tag["oncontextmenu"].strip().lower() == "return false":
+                    return 1
+        # Check for script disabling right-click
+        if re.search(r"event\.button\s*==\s*2", txt) or re.search(r"event\.which\s*==\s*3", txt):
             return 1
         return 0
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -327,11 +344,27 @@ class PhishingFeatureExtractor:
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 26
     def iframes(self) -> int:
-        return len(self.soup.find_all("iframe")) if self.soup else 0
+        count = 0
+        if self.soup:
+            # Count all iframe tags
+            count += len(self.soup.find_all("iframe"))
+        # Also check for dynamically created iframes in scripts
+        txt = (self.html or "").lower()
+        # Look for document.createElement('iframe') or similar patterns
+        dynamic_iframe_patterns = [
+            r"document\.createelement\(['\"]iframe['\"]\)",
+            r"<iframe[\s>]",
+            r"window\.frames",
+            r"appendchild\s*\(\s*iframe",
+        ]
+        for pat in dynamic_iframe_patterns:
+            if re.search(pat, txt):
+                count += 1
+        return count
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 27
     def sensitive_forms(self) -> int:
-        sensitive_keywords = ["password", "pass", "cardnumber", "creditcard", "card", "cvv", "cvc", "ssn", "socialsecurity"]
+        sensitive_keywords = ["password", "username", "user", "pass", "cardnumber", "creditcard", "card", "cvv", "cvc", "ssn", "socialsecurity"]
         txt = (self.html or "").lower()
         return sum(txt.count(k) for k in sensitive_keywords)
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -373,6 +406,11 @@ class PhishingFeatureExtractor:
         except Exception:
             pass
         return total
+    # Explanation of DNS Record Types:
+    # A = Maps the IPV4 Record
+    # AAAA =  Maps the IPV6 Record
+    # MX - Maps the Mail Exchange Records
+    # NS - Name Server Records
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 30
     def traffic_rank(self) -> int:
