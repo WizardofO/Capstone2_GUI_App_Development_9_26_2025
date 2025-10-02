@@ -45,4 +45,4 @@ PHISHINGDETECTOR_ML
 - You may need to adjust CORS settings in the Flask app if you encounter any issues with requests from the extension.
 
 ## License
-This project is licensed under the MIT License.
+This project is licensed under the MMDC License 2025.
