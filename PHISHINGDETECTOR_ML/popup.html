@@ -18,13 +18,31 @@
   <div class="input-container">
     <input type="text" id="urlInput" placeholder="Enter URL to check..." style="font-size:1.3em; height:2.5em;" />
     <button id="detectBtn">Detect</button>
+    <button id="summaryBtn" style="margin-top:8px;" disabled>SUMMARY</button>
   </div>
   <div id="result"></div>
-  <div class="footer-text">MMDC_Capstone2_NIEVAOSIASJR_2025-26</div>
   <div class="footer-text2">This application is an exclusive property of Mapua-Malayan Digital College and is protected under Republic Act No. 8293</div>
   <div class="footer-text3">otherwise known as the Intellectual Property Code of the Philippines. Unauthorized reproduction</div>
   <div class="footer-text4">distribution, or use of this software, in whole or in part, is strictly prohibited and may result in civil and criminal liabilities.</div>
   <div class="footer-text5">For permissions or inquiries, please contact MMDC-ISD at isd@mmdc.mcl.edu.ph.</div> 
+  <div class="footer-text">MMDC_Capstone2_NIEVA OSIAS JR_2025-26</div>
+  
+  <!-- Modal for summary -->
+  <div id="summaryModal" style="display:none;position:fixed;z-index:1000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.35);justify-content:center;align-items:center;">
+    <div style="background:#fff;padding:24px 18px 18px 18px;border-radius:12px;max-width:420px;width:90vw;box-shadow:0 4px 24px #888;position:relative;">
+      <span id="closeSummary" style="position:absolute;top:8px;right:16px;font-size:1.5em;cursor:pointer;color:#1976d2;">&times;</span>
+      <div id="summaryContent"></div>
+    </div>
+  </div>
+  <div id="summaryReportContainer" class="summary-report-container" style="display:none;">
+    <div class="summary-report-title">Signature_Based Detection Summary Report</div>
+    <div id="summaryReportContent"></div>
+    <div class="summary-btn-row">
+      <button id="saveSummaryBtn" class="save-summary-btn">Save as TXT</button>
+      <button id="exportSummaryCSV" class="export-summary-btn">Export CSV</button>
+      <button id="exportSummaryPDF" class="export-summary-btn">Export PDF</button>
+    </div>
+  </div>
   <script src="popup.js"></script>
 </body>
 </html>

@@ -84,10 +84,10 @@ def predict():
         if expected_features is not None and len(X[0]) != expected_features:
             return jsonify({'error': f'Input has {len(X[0])} features, but model expects {expected_features} features.'}), 400
 
-        proba = None
+        proba = None    # Default to None if probability prediction fails                                   
         try:
             probs = model.predict_proba(X)
-            score = float(probs[0][1]) if probs.shape[1] == 2 else float(probs[0].max())
+            score = float(probs[0][1]) if probs.shape[1] == 2 else float(probs[0].max())    # This is for Phishing probability Calculation Area occurs
             proba = score
         except Exception:
             proba = None
@@ -97,7 +97,7 @@ def predict():
 
         # Balanced prediction logic: use both probability and class_weight if available
         # balanced_threshold = 0.10 
-        balanced_threshold = 0.5            # (SOLUTION FOR THE ISSUE of imbalanced dataset)
+        balanced_threshold = 0.5            # (SOLUTION FOR THE ISSUE of imbalanced dataset) SMOTE Technique was used to balance the dataset
         class_weight = getattr(model, 'class_weight', None)
         if class_weight and isinstance(class_weight, dict):
             w0 = class_weight.get(0, 1)
@@ -132,6 +132,70 @@ def predict():
         }
         return jsonify(resp)
     except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/summary_report', methods=['POST'])
+def summary_report():
+    data = request.get_json(force=True)
+    url = data.get('url') if isinstance(data, dict) else None
+    if not url:
+        return jsonify({'error': 'No url provided.'}), 400
+    try:
+        extractor = PhishingFeatureExtractor(url=url)
+        features_dict = extractor.extract_all()
+        # Explanations for each feature
+        feature_explanations = {
+            "ip_in_url": "Checks if the URL contains an IP address (common in phishing).",
+            "url_length": "Long URLs are often used to obfuscate phishing attempts.",
+            "url_shortening": "URL shorteners can hide the true destination (phishing tactic).",
+            "presence_at": "The '@' symbol in URLs can redirect to malicious sites.",
+            "redirection_symbol": "Multiple '//' in URL path may indicate redirection tricks.",
+            "hyphen_in_domain": "Hyphens in domain names are more common in phishing sites.",
+            "too_many_subdomains": "Excessive subdomains can mimic legitimate domains.",
+            "https_in_string": "'https' in the path/query may be used to appear secure.",
+            "ssl_tls_validity": "Checks if SSL/TLS is valid (phishing sites may lack it).",
+            "domain_registration_length": "Short-lived domains are often used for phishing.",
+            "non_standard_ports": "Non-standard ports can be suspicious.",
+            "external_favicon": "External favicons may indicate phishing.",
+            "count_dots": "Many dots in the URL can indicate obfuscation.",
+            "suspicious_chars": "Suspicious characters (?, %, &, =, +) are often used in phishing URLs.",
+            "known_logo": "Checks for known brand logos (may be abused by phishing).",
+            "use_script": "Use of scripts can be used for malicious purposes.",
+            "count_third_party_domains": "Many third-party domains can be suspicious.",
+            "use_meta": "Meta tags can be abused for phishing.",
+            "script_external_ratio": "High ratio of external scripts may be suspicious.",
+            "use_form": "Phishing sites often use forms to steal data.",
+            "mailto": "'mailto:' links can be used for phishing.",
+            "website_forwarding": "Forwarding can hide the real destination.",
+            "status_bar_customization": "Custom status bars can hide true links.",
+            "right_click_disabled": "Disabling right-click can prevent inspection.",
+            "popups": "Popups are often used in phishing.",
+            "iframes": "Iframes can be used to load malicious content.",
+            "sensitive_forms": "Sensitive forms are a phishing indicator.",
+            "domain_age": "Young domains are more likely to be phishing.",
+            "dns_record_count": "Low DNS record count can indicate a suspicious site.",
+            "website_traffic_rank": "Low traffic rank may indicate a fake site.",
+            "page_ranking": "Low page rank can be suspicious.",
+            "google_index": "Not indexed by Google may indicate a new/suspicious site.",
+            "backlinks": "Few backlinks may indicate a fake site.",
+            "blacklist": "Blacklisted domains are phishing.",
+            "whois_suspicious_tokens": "Suspicious WHOIS info can indicate phishing."
+        }
+        summary = []
+        for k, v in features_dict.items():
+            explanation = feature_explanations.get(k, "")
+            summary.append({
+                "feature": k,
+                "value": v,
+                "explanation": explanation
+            })
+        return jsonify({
+            'summary_report': summary,
+            'features': features_dict
+        })
+    except Exception as e:
+        import traceback
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 

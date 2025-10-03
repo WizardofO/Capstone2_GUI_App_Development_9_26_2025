@@ -21,13 +21,13 @@ from PySide6.QtGui import QFont, QPalette, QColor, QIcon
 from PySide6.QtWidgets import QGraphicsDropShadowEffect
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # ML libs
-import pandas as pd
-import numpy as np
-import joblib
-from sklearn.ensemble import RandomForestClassifier, VotingClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.naive_bayes import GaussianNB
-from sklearn.preprocessing import StandardScaler
+import pandas as pd                                        # Pandas is used for data manipulation and analysis.Used in this code specifically for handling datasets like CSV files, dataframes, and tabular data.                 
+import numpy as np                                         # NumPy is used for numerical operations and array manipulations. Used in this code specifically for handling numerical data, arrays, and mathematical computations.
+import joblib                                              # Joblib is used for saving and loading machine learning models. Used in this code specifically for persisting trained ML models to disk and loading them back for predictions.
+from sklearn.ensemble import RandomForestClassifier, VotingClassifier   
+from sklearn.tree import DecisionTreeClassifier            # DecisionTreeClassifier is used for classification tasks. Used in this code specifically for building decision tree models for phishing detection.
+from sklearn.naive_bayes import GaussianNB                 # GaussianNB is used for classification tasks based on Bayes' theorem. Used in this code specifically for building Naive Bayes models for phishing detection.
+from sklearn.preprocessing import StandardScaler           # StandardScaler is used for feature scaling. Used in this code specifically for normalizing feature values to have zero mean and unit variance.
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 
@@ -47,7 +47,7 @@ import dns.resolver                                         # dnspython is used 
 import hashlib
 from bs4 import BeautifulSoup
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-REQUESTS_TIMEOUT = 10
+REQUESTS_TIMEOUT = 10                                       # This line of code was used to set a timeout value (in seconds) for network requests made using the requests library to prevent hanging requests.
 LOGO_HASH_FILE = os.getenv('LOGO_HASH_FILE', 'logo_hashes.json')
 TRANC0_LOCAL = os.getenv('TRANCO_CSV_PATH', 'tranco.csv')
 
@@ -96,15 +96,17 @@ class PhishingFeatureExtractor:
         except Exception:
             self.known_logo_hashes = set()
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-    def fetch_html(self) -> str:
+    # Purpose is to fetch the HTML content of a given URL using the requests library the output of this function is a string 
+    # containing the HTML content of the webpage if the URL is valid and accessible otherwise it returns an empty string.
+    def fetch_html(self) -> str:    
         if not self.url:
-            return ''
+            return ''   # this code
         try:
             headers = {'User-Agent': 'PhishFeatureBot/1.0'}
             r = requests.get(self.url, timeout=REQUESTS_TIMEOUT, headers=headers, verify=False)
-            return r.text or ''
+            return r.text or '' 
         except Exception:
-            return ''
+            return '' 
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 1
     def ip_in_url(self) -> int:
@@ -588,7 +590,7 @@ class SingleURLWorker(QThread):
 
             pred = int(model.predict(feed)[0])
             try:
-                prob = float(model.predict_proba(feed)[0][1])
+                prob = float(model.predict_proba(feed)[0][1])       # this line is for Phishing probability Calculation Area occurs
             except Exception:
                 prob = None
 

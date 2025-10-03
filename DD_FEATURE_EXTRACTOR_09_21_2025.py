@@ -564,6 +564,7 @@ class PhishingFeatureExtractor:
         result["iframes"] = int(self.iframes())
         result["sensitive_forms"] = int(self.sensitive_forms())
 
+
         result["domain_age"] = int(self.domain_age())
         result["dns_record_count"] = int(self.dns_record())
 

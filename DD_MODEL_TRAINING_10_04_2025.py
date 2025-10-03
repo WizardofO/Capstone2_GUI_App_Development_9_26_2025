@@ -54,7 +54,7 @@ Applicable to Various Data Types: SMOTE can be applied to datasets with both con
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 # Worker thread for training
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-class TrainerThread(QThread):   
+class Model_Training_for_PHISHINGDETECTOR(QThread):   
     progress = Signal(int)  # percent
     finished = Signal(dict, object)  # metrics dict, saved_model_path or None
     error = Signal(str)
@@ -76,8 +76,8 @@ class TrainerThread(QThread):
             if label_col is None:
                 self.error.emit("No label column found in CSV (expected 'label').")                     # if not found, emit error and
                 return
-            # coerce label                                                                              # coerce means invalids become NaN
-            df[label_col] = pd.to_numeric(df[label_col], errors="coerce")                               # convert label to numeric, invalids to NaN
+            # coerce label                                                                              
+            df[label_col] = pd.to_numeric(df[label_col], errors="make it invalid")                      # convert label to numeric, invalids to NaN
             df = df.dropna(subset=[label_col])                                                          # drop rows with NaN labels
             df[label_col] = df[label_col].astype(int)                                                   # convert label to int                    
             self.progress.emit(10)                                                                      # This code block is for preprocessing the data, handling missing values, and preparing it for model training
@@ -90,7 +90,7 @@ class TrainerThread(QThread):
             # drop constant columns
             numeric = numeric.loc[:, numeric.nunique() > 1]                                             # this code is for dropping constant columns
 
-            X = numeric.drop(columns=[label_col])
+            X = numeric.drop(columns=[label_col])                                                            
             y = numeric[label_col]
             X = X.fillna(X.median())
             self.progress.emit(20)
@@ -104,8 +104,8 @@ class TrainerThread(QThread):
 
             # to handle imbalance with SMOTE if available  
             imbalance_ratio = y_train.value_counts(normalize=True)
-            min_class = imbalance_ratio.idxmin()
-            max_class = imbalance_ratio.idxmax()
+            min_class = imbalance_ratio.idxmin()            # idxmax means the class with the highest count
+            max_class = imbalance_ratio.idxmax()            # idxmin means the class with the lowest count   
             ratio = imbalance_ratio[min_class] / imbalance_ratio[max_class] if imbalance_ratio[max_class] > 0 else 0
             warn_imbalance = False
             if IMBLEARN_AVAILABLE:
@@ -117,8 +117,8 @@ class TrainerThread(QThread):
                 if ratio < 0.5:
                     warn_imbalance = True  
 
-            self.progress.emit(45)
-
+            self.progress.emit(45)     # this code emit(45) 45 can be replaced with any number between 0-100 depending on the progress of the training process
+                                       # 45 was use to indicate that the training process is almost halfway done
             # scaler for NB
             scaler = StandardScaler()
             X_train_s = scaler.fit_transform(X_train_bal)
@@ -134,10 +134,10 @@ class TrainerThread(QThread):
             )
 
             models = {
-                "RandomForest": (rf, X_train_bal, X_test),
-                "DecisionTree": (dt, X_train_bal, X_test),
-                "NaiveBayes": (nb, X_train_s, X_test_s),
-                "VotingTrees": (voting, X_train_bal, X_test)
+                "RandomForest": (rf, X_train_bal, X_test),      # RandomForest uses balanced data without scaling meaning it can handle raw numeric data 
+                "DecisionTree": (dt, X_train_bal, X_test),      # DecisionTree uses balanced data without scaling
+                "NaiveBayes": (nb, X_train_s, X_test_s),        # NaiveBayes uses scaled data meaning it needs standardized input and
+                "VotingTrees": (voting, X_train_bal, X_test)    # Voting of trees uses balanced data without scaling
             }
 
             results = {}
@@ -286,7 +286,7 @@ class MainWindow(QMainWindow):
             return
         self.model_path = out_path
         # start trainer thread
-        self.trainer = TrainerThread(self.csv_path, model_out_path=self.model_path)
+        self.trainer = Model_Training_for_PHISHINGDETECTOR(self.csv_path, model_out_path=self.model_path)
         self.trainer.progress.connect(self.on_progress)
         self.trainer.finished.connect(self.on_train_finished)
         self.trainer.error.connect(self.on_train_error)
