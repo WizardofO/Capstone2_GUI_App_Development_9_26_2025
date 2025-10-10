@@ -4,7 +4,11 @@ body {
     min-height: 440px;
     margin: 0;
     padding: 24px;
-    background: #e3f2fd; /* light blue */
+    /*background: #e3f2fd; /* light blue */
+    /*background: #abdcff; /* light blue */
+    /*background: linear-gradient(to bottom right, #abdcff, #0396ff);*/
+    background: linear-gradient(to bottom, #ffffff, #5abaff);
+    /*background: linear-gradient(135deg, #abdcff 0%, #0396ff 50%, #0072ff 100%);*/
 }
 
 .logo-container {
@@ -16,7 +20,6 @@ body {
     width: 64px;
     height: 64px;
 }
-
 .input-container {
     display: flex;
     flex-direction: column;
@@ -140,3 +143,26 @@ body {
     background: linear-gradient(90deg, #1565c0 60%, #1976d2 100%);
     box-shadow: 0 2px 8px #90caf9;
 }
+
+.logo-row {
+      display: flex;
+      justify-content: center; /* center all logos horizontally */
+      align-items: center;
+      gap: 20px; /* space between logos */
+      margin: 12px 0;
+      box-shadow: #222;                                                                                                                         
+    }
+    .logo {
+      height: 80px;
+      width: auto;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25); /* adds a nice soft shadow */
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      background-color: #ffffff; /* optional: ensures shadow is visible on transparent logos */
+      padding: 6px
+    }
+    .logo:hover {
+      transform: scale(.90);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35); /* stronger shadow on hover */
+    }

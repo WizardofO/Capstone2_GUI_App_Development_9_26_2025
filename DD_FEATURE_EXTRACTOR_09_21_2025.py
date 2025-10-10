@@ -106,7 +106,7 @@ class PhishingFeatureExtractor:
             return ""
         try:
             headers = {"User-Agent": "PhishFeatureBot/1.0"}
-            r = requests.get(self.url, timeout=REQUESTS_TIMEOUT, headers=headers, verify=False)
+            r = requests.get(self.url, timeout=REQUESTS_TIMEOUT, headers=headers, verify=False) # to get all the HTML content of the URL use
             return r.text or ""
         except Exception:
             return ""
@@ -539,36 +539,37 @@ class PhishingFeatureExtractor:
         result["url_shortening"] = int(self.url_shortening())
         result["presence_at"] = int(self.presence_at())
         result["redirection_symbol"] = int(self.redirection_symbol())
+        
         result["hyphen_in_domain"] = int(self.hyphen_in_domain())
         result["too_many_subdomains"] = int(self.too_many_subdomains())
         result["https_in_string"] = int(self.https_in_string())
         result["ssl_tls_validity"] = int(self.ssl_tls_validity())
         result["domain_registration_length"] = int(self.domain_registration_length())
+
         result["non_standard_ports"] = int(self.non_standard_ports())
         result["external_favicon"] = int(self.external_favicon())
         result["count_dots"] = int(self.count_dots())
         result["suspicious_chars"] = int(self.suspicious_chars())
-
         result["known_logo"] = int(self.known_logo())
+
         result["use_script"] = int(self.use_script())
         result["count_third_party_domains"] = int(self.count_third_party_domains())
         result["use_meta"] = int(self.use_meta())
         result["script_external_ratio"] = int(self.script_external_ratio())
         result["use_form"] = int(self.use_form())
-        result["mailto"] = int(self.mailto())
 
+        result["mailto"] = int(self.mailto())
         result["website_forwarding"] = int(self.website_forwarding())
         result["status_bar_customization"] = int(self.status_bar())
         result["right_click_disabled"] = int(self.right_click_disabled())
         result["popups"] = int(self.popups())
+
         result["iframes"] = int(self.iframes())
         result["sensitive_forms"] = int(self.sensitive_forms())
-
-
         result["domain_age"] = int(self.domain_age())
         result["dns_record_count"] = int(self.dns_record())
-
         result["website_traffic_rank"] = int(self.traffic_rank())
+
         result["page_ranking"] = int(self.page_ranking())
         result["google_index"] = int(self.google_index())
         result["backlinks"] = int(self.backlinks())
@@ -584,7 +585,7 @@ class PhishingFeatureExtractor:
 class WorkerSignals(QObject):
     row_done = Signal(int, dict, str)   # index, features dict, error string
     progress = Signal(int, int)         # done_count, total
-    finished = Signal()
+    finished = Signal()                 # This code was used to signal that the worker has finished processing all rows.
 
 # Worker that uses ThreadPoolExecutor and emits signals
 class BatchWorker:

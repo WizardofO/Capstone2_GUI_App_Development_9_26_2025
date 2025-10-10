@@ -2,14 +2,13 @@
 # Author: Osias Nieva 
 """
 PySide6 GUI for training / saving / using a phishing detection pipeline.
-
 Features:
-- Load feature CSV (expects a numeric features + 'label' column)
-- Train models (RandomForest, DecisionTree, GaussianNB, Voting of trees)
-- Handle class imbalance with SMOTE (on training data)
-- Evaluate on a hold-out test set and show metrics
-- Save best model to disk, load saved model
-- Predict on a new CSV and save results
+- Load feature CSV (expects a numeric features + 'label' column)            RUNNING as of 10/04/2025
+- Train models (RandomForest, DecisionTree, GaussianNB, Voting of trees)    RUNNING as of 10/04/2025
+- Handle class imbalance with SMOTE (on training data)                      RUNNING as of 10/04/2025
+- Evaluate on a hold-out test set and show metrics                          RUNNING as of 10/04/2025     
+- Save best model to disk, load saved model                                 RUNNING as of 10/04/2025
+- Predict on a new CSV and save results                                     RUNNING as of 10/04/2025
 """
 
 import os                                               # os is for file path handling
@@ -69,7 +68,7 @@ class Model_Training_for_PHISHINGDETECTOR(QThread):
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
     def run(self):
         try:
-            self.progress.emit(5)                                                                       # This code block is for loading the CSV file and preparing the data for training
+            self.progress.emit(5)      # 5% was use to indicate that the training process is at 5% completion.               
             df = pd.read_csv(self.csv_path, encoding="utf-8")
             # find label column
             label_col = next((c for c in ["label", "Label", "y"] if c in df.columns), None)             # look for common label column names
@@ -96,7 +95,7 @@ class Model_Training_for_PHISHINGDETECTOR(QThread):
             self.progress.emit(20)
 
             # train/test split (stratified)
-            from sklearn.model_selection import train_test_split                    # test_size=0.2 means 20% of data is for testing, 80% for training. 
+            from sklearn.model_selection import train_test_split                    # test_size=0.20 means 20% of data is for testing, 80% for training. 
             X_train, X_test, y_train, y_test = train_test_split(
                 X, y, test_size=0.2, stratify=y, random_state=self.random_state
             )
@@ -117,15 +116,15 @@ class Model_Training_for_PHISHINGDETECTOR(QThread):
                 if ratio < 0.5:
                     warn_imbalance = True  
 
-            self.progress.emit(45)     # this code emit(45) 45 can be replaced with any number between 0-100 depending on the progress of the training process
-                                       # 45 was use to indicate that the training process is almost halfway done
+            self.progress.emit(45)     # 45% was use to indicate that the training process is at 45% completion.
+                                       
             # scaler for NB
             scaler = StandardScaler()
             X_train_s = scaler.fit_transform(X_train_bal)
             X_test_s = scaler.transform(X_test)
 
             # prepare models with class_weight for supported classifiers
-            rf = RandomForestClassifier(n_estimators=100, random_state=self.random_state, class_weight="balanced")
+            rf = RandomForestClassifier(n_estimators=100, random_state=self.random_state, class_weight="balanced")  # the 100
             dt = DecisionTreeClassifier(random_state=self.random_state, class_weight="balanced")
             nb = GaussianNB()
             voting = VotingClassifier(
@@ -179,11 +178,11 @@ class Model_Training_for_PHISHINGDETECTOR(QThread):
                 "features": list(X.columns),
                 "label_col": label_col
             }
-            joblib.dump(to_save, self.model_out_path)
+            joblib.dump(to_save, self.model_out_path)       # Saving the trained model to the specified output path
 
-            self.progress.emit(100)
+            self.progress.emit(100)                         # SHOW THAT THE PROGRESS REPORT IS COMPLETE
 
-            # Warn user if imbalance is detected and SMOTE is not available
+            # CHECK AND BALANCE: Warn user if imbalance is detected and SMOTE is not available
             if warn_imbalance:
                 self.error.emit("Warning: Severe class imbalance detected and SMOTE is not available. Results may be biased. Install imbalanced-learn for better balancing.")
             self.finished.emit(results, os.path.abspath(self.model_out_path))
