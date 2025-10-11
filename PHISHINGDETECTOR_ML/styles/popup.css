@@ -84,6 +84,24 @@ body {
     color: #1976d2;
     font-weight: normal;
 }
+.footer-text6, .footer-text7 {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 1em;
+    color: #1976d2;
+    font-weight: bold;
+}
+.footer-text7 {
+    margin-top: 5px;
+    text-align: center;
+    font-size: 1em;
+    color: #1976d2;
+    font-weight: bold;
+}
+
+
+
+
 .summary-report-container {
     margin: 28px auto 0 auto;
     background: linear-gradient(135deg, #e3f2fd 0%, #f8fafc 100%);
@@ -166,3 +184,86 @@ body {
       transform: scale(.90);
       box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35); /* stronger shadow on hover */
     }
+.report-issue-btn {
+    position: fixed;
+    left: 18px;
+    bottom: 18px;
+    background: linear-gradient(90deg, #d32f2f 60%, #1976d2 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 22px;
+    font-size: 1em;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: 0 1px 4px #b3c6e0;
+    z-index: 999;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.report-issue-btn:hover {
+    background: linear-gradient(90deg, #b71c1c 60%, #1565c0 100%);
+    box-shadow: 0 2px 8px #90caf9;
+}
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.35);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background: #2eabff;
+    padding: 24px 30px 18px 18px;   /* top right bottom left */
+    border-radius: 12px;
+    max-width: 420px;
+    width: 90vw;
+    box-shadow: 0 4px 24px #888;
+    position: relative;
+}
+.close {
+    position: absolute;
+    top: 8px;
+    right: 16px;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #1976d2;
+}
+#reportForm label {
+    display: block;
+    margin-top: 12px;
+    font-weight: bold;
+    color: #fff;
+}
+#reportForm input, #reportForm textarea {
+    width: 100%;
+    margin-top: 4px;
+    padding: 6px;
+    border-radius: 6px;
+    border: 1px solid #b3c6e0;
+    font-size: 1em;
+}
+.submit-report-btn {
+    margin-top: 16px;
+    background: linear-gradient(90deg, #1976d2 60%, #42a5f5 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 22px;
+    font-size: 1em;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: 0 1px 4px #b3c6e0;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.submit-report-btn:hover {
+    background: linear-gradient(90deg, #1565c0 60%, #1976d2 100%);
+    box-shadow: 0 2px 8px #90caf9;
+}
+#reportStatus {
+    margin-top: 12px;
+    color: #1976d2;
+    font-weight: bold;
+}

@@ -28,7 +28,8 @@
   <div class="footer-text3">otherwise known as the Intellectual Property Code of the Philippines. Unauthorized reproduction</div>
   <div class="footer-text4">distribution, or use of this software, in whole or in part, is strictly prohibited and may result in civil and criminal liabilities.</div>
   <div class="footer-text5">For permissions or inquiries, please contact MMDC-ISD at isd@mmdc.mcl.edu.ph.</div> 
-  <div class="footer-text">MMDC_Capstone2_NIEVA OSIAS JR_2025-26</div>
+  <div class="footer-text6">MMDC_Capstone2_NIEVA OSIAS JR_2025-26</div>
+  <div class="footer-text7">lr.onieva@mmdc.mcl.edu.ph</div>
   
   <!-- Modal for summary -->
   <div id="summaryModal" style="display:none;position:fixed;z-index:1000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.35);justify-content:center;align-items:center;">
@@ -46,6 +47,31 @@
       <button id="exportSummaryPDF" class="export-summary-btn">Export PDF</button>
     </div>
   </div>
+
+  <!-- Report Issue Button (lower left) -->
+  <button id="reportIssueBtn" class="report-issue-btn">Report Issue</button>
+
+  <!-- Report Issue Modal -->
+  <div id="reportIssueModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span id="closeReportModal" class="close">&times;</span>
+      <h2>Report Issue / Suggestion</h2>
+      <form id="reportForm">
+        <label for="reportName">Name:</label>
+        <input type="text" id="reportName" name="reportName" required>
+        <label for="reportEmail">Email:</label>
+        <input type="email" id="reportEmail" name="reportEmail" required>
+        <label for="reportMessage">Suggestions / Issues:</label>
+        <textarea id="reportMessage" name="reportMessage" rows="4" required></textarea>
+        <label for="reportScreenshot">Attach Screenshot:</label>
+        <input type="file" id="reportScreenshot" name="reportScreenshot" accept="image/*">
+        <button type="submit" class="submit-report-btn">Submit Report</button>
+        <div class="footer-text6">MMDC_Capstone2_NIEVA OSIAS JR_2025-26</div>
+      </form>
+      <div id="reportStatus"></div>
+    </div>
+  </div>
+
   <script src="popup.js"></script>
 </body>
 </html>

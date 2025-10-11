@@ -5,7 +5,8 @@ from flask import Flask, request, jsonify                   # Flask web server w
 import traceback                                            # For error handling and debugging.
 import os                                                   # For file path manipulations.                  
 import joblib                                               # For loading the pre-trained ML model.
-import sys                                                  # For system-specific parameters and functions.                     
+import sys                                                  # For system-specific parameters and functions.  
+import time                   
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from DD_FEATURE_EXTRACTOR_09_21_2025 import PhishingFeatureExtractor    # From ORIGINAL FEATURE EXTRACTOR using Custom feature extractor for phishing detection imported from a separate module.
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
@@ -14,7 +15,7 @@ app = Flask(__name__)                                       # Initialize the Fla
 #MODEL_PATH = os.path.join(os.path.dirname(__file__), 'best_phishing_model_08.pkl')                    # Path to my old pre-trained model file.
 MODEL_PATH = os.path.join(os.path.dirname(__file__), 'best_phishing_model_14_Balanced Model.pkl')      # Path to the pre-trained model file.
 
-# Load the model using joblib
+# Load the latest .pkl model using joblib
 try:
     loaded = joblib.load(MODEL_PATH)
     # If loaded is a dict, get the model object and feature list
@@ -41,7 +42,7 @@ def extract_features(url, feature_keys):
     features_dict = extractor.extract_all()
     return [[features_dict.get(k, 0) for k in feature_keys]]
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
-# Example usage:
+#  
 # For a model trained on 23 features
 features_23 = [
     "ip_in_url", "url_length", "url_shortening", "presence_at", "redirection_symbol",
@@ -96,7 +97,7 @@ def predict():
         label = str(pred[0])
 
         # Balanced prediction logic: use both probability and class_weight if available
-        # balanced_threshold = 0.10 
+        # old balanced_threshold used = 0.10 lean to legitimate to all sites
         balanced_threshold = 0.5            # (SOLUTION FOR THE ISSUE of imbalanced dataset) SMOTE Technique was used to balance the dataset
         class_weight = getattr(model, 'class_weight', None)
         if class_weight and isinstance(class_weight, dict):
@@ -198,6 +199,26 @@ def summary_report():
         import traceback
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
+
+@app.route('/report_issue', methods=['POST'])
+def report_issue():
+    try:
+        name = request.form.get('name')
+        email = request.form.get('email')
+        message = request.form.get('message')
+        screenshot = request.files.get('screenshot')
+        # Save report to disk or send via email (example: save to disk)
+        report_dir = 'reports'
+        os.makedirs(report_dir, exist_ok=True)
+        report_id = f"{int(time.time())}_{name.replace(' ', '_')}"
+        report_path = os.path.join(report_dir, f"{report_id}.txt")
+        with open(report_path, 'w', encoding='utf-8') as f:
+            f.write(f"Name: {name}\nEmail: {email}\nMessage: {message}\n")
+        if screenshot:
+            screenshot.save(os.path.join(report_dir, f"{report_id}_screenshot.png"))
+        return jsonify({'status': 'success'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'error': str(e)}), 500
 
 if __name__ == '__main__':
     # CORS: it's simplest to allow everything locally

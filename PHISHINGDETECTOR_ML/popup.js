@@ -179,6 +179,68 @@ document.getElementById('exportSummaryPDF').addEventListener('click', function()
 });
 
 // ----------------------------
+// Report Issue Button and Modal Logic
+// ----------------------------
+const reportBtn = document.getElementById('reportIssueBtn');
+const reportModal = document.getElementById('reportIssueModal');
+const closeReportModal = document.getElementById('closeReportModal');
+const reportForm = document.getElementById('reportForm');
+const reportStatus = document.getElementById('reportStatus');
+
+// Show modal
+reportBtn.addEventListener('click', () => {
+    reportModal.style.display = 'flex';
+    reportStatus.textContent = '';
+    reportForm.reset();
+});
+
+// Hide modal
+closeReportModal.addEventListener('click', () => {
+    reportModal.style.display = 'none';
+});
+reportModal.addEventListener('click', (e) => {
+    if (e.target === reportModal) {
+        reportModal.style.display = 'none';
+    }
+});
+
+// Handle form submit
+reportForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    reportStatus.textContent = 'Sending...';
+
+    const name = document.getElementById('reportName').value.trim();
+    const email = document.getElementById('reportEmail').value.trim();
+    const message = document.getElementById('reportMessage').value.trim();
+    const screenshotFile = document.getElementById('reportScreenshot').files[0];
+
+    // Prepare form data
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('email', email);
+    formData.append('message', message);
+    if (screenshotFile) {
+        formData.append('screenshot', screenshotFile);
+    }
+
+    // You need a backend endpoint to receive this report, e.g. /report_issue
+    try {
+        const response = await fetch('http://localhost:5000/report_issue', {
+            method: 'POST',
+            body: formData
+        });
+        if (response.ok) {
+            reportStatus.textContent = 'Report submitted successfully!';
+            setTimeout(() => { reportModal.style.display = 'none'; }, 1500);
+        } else {
+            reportStatus.textContent = 'Failed to submit report.';
+        }
+    } catch (err) {
+        reportStatus.textContent = 'Error sending report.';
+    }
+});
+
+// ----------------------------
 // Helper functions
 // ----------------------------
 function renderSummaryModal(content) {
