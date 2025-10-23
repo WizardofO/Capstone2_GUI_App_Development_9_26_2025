@@ -13,26 +13,26 @@ PySide6 GUI wrapper around the 35-feature phishing extractor.
         Save JSON.
 3. Concurrent extraction using ThreadPoolExecutor (configurable workers).
 """
-import sys
-import os
-import csv
-import json
-import re
-import time
-import threading
-import traceback
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from functools import partial
-from datetime import datetime
-from urllib.parse import urlparse, urljoin
+import sys                                                          # used for system-specific parameters and functions
+import os                                                           # used for environment variables and file path operations
+import csv                                                          # used for reading and writing CSV files                             
+import json                                                         # used for handling JSON data                           
+import re                                                           # used for regular expressions 
+import time                                                         # used for time-related functions
+import threading                                                    # used for threading operations                   
+import traceback                                                    # used for extracting, formatting, and printing stack traces    
+from concurrent.futures import ThreadPoolExecutor, as_completed     # used for concurrent execution of tasks using threads
+from functools import partial                                       # used for creating partial functions               
+from datetime import datetime                                       # used for manipulating dates and times
+from urllib.parse import urlparse, urljoin                          # used for parsing and joining URLs    
 
 # GUI
-from PySide6.QtWidgets import (
+from PySide6.QtWidgets import (                                         
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QFileDialog, QTableWidget, QTableWidgetItem, QProgressBar,
     QLabel, QSpinBox, QMessageBox
-)
-from PySide6.QtCore import Qt, Signal, QObject
+)                                                                   # used for creating GUI components
+from PySide6.QtCore import Qt, Signal, QObject                      # used for core Qt functionalities  
 
 # Networking / parsing libs
 import requests                                                     # requests is for HTTP requests                               
@@ -198,7 +198,7 @@ class PhishingFeatureExtractor:
         port = self.parsed.port
         if port is None:
             return 0
-        return 1 if port not in (80, 443) else 0
+        return 1 if port not in (80, 443) else 0 # 80 HTTP and 443 is HTTPS
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 12
     def external_favicon(self) -> int:
@@ -364,7 +364,8 @@ class PhishingFeatureExtractor:
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
     # 27
     def sensitive_forms(self) -> int:
-        sensitive_keywords = ["password", "username", "user", "pass", "cardnumber", "creditcard", "card", "cvv", "cvc", "ssn", "socialsecurity"]
+        sensitive_keywords = ["password", "username", "user", "pass", "cardnumber", "creditcard", "card", "cvv", "cvc", "ssn", 
+                              "socialsecurity", "ip","victim","ipaddress", "useragent", "browser"]
         txt = (self.html or "").lower()
         return sum(txt.count(k) for k in sensitive_keywords)
 # ------------------------------------------------------------------------------------------------------------------------------------------ #

@@ -119,12 +119,12 @@ class Model_Training_for_PHISHINGDETECTOR(QThread):
             self.progress.emit(45)     # 45% was use to indicate that the training process is at 45% completion.
                                        
             # scaler for NB
-            scaler = StandardScaler()
-            X_train_s = scaler.fit_transform(X_train_bal)
-            X_test_s = scaler.transform(X_test)
+            scaler = StandardScaler()                       # standardizes features by removing the mean and scaling to unit variance meaning each feature will have a mean of 0 and a standard deviation of 1.
+            X_train_s = scaler.fit_transform(X_train_bal)   # fit and transform on training balanced set
+            X_test_s = scaler.transform(X_test)             # only transform on test set
 
             # prepare models with class_weight for supported classifiers
-            rf = RandomForestClassifier(n_estimators=100, random_state=self.random_state, class_weight="balanced")  # the 100
+            rf = RandomForestClassifier(n_estimators=100, random_state=self.random_state, class_weight="balanced")  # the 100 is for number of trees in the forest
             dt = DecisionTreeClassifier(random_state=self.random_state, class_weight="balanced")
             nb = GaussianNB()
             voting = VotingClassifier(
