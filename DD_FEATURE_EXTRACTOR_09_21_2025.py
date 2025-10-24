@@ -365,7 +365,7 @@ class PhishingFeatureExtractor:
     # 27
     def sensitive_forms(self) -> int:
         sensitive_keywords = ["password", "username", "user", "pass", "cardnumber", "creditcard", "card", "cvv", "cvc", "ssn", 
-                              "socialsecurity", "ip","victim","ipaddress", "useragent", "browser"]
+                              "socialsecurity", "ip","victim","ipaddress", "useragent", "browser" ,"id", "__csrf", "captchaKey"]
         txt = (self.html or "").lower()
         return sum(txt.count(k) for k in sensitive_keywords)
 # ------------------------------------------------------------------------------------------------------------------------------------------ #

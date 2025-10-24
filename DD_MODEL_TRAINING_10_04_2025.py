@@ -27,7 +27,7 @@ from PySide6.QtCore import Qt, Signal, QThread
 
 # ML imports
 from sklearn.ensemble import RandomForestClassifier, VotingClassifier                               # Selected Methods ensemble methods for classification
-from sklearn.tree import DecisionTreeClassifier                                                     # 
+from sklearn.tree import DecisionTreeClassifier                                                      
 from sklearn.naive_bayes import GaussianNB
 from sklearn.preprocessing import StandardScaler        
 from sklearn.metrics import (
@@ -54,9 +54,9 @@ Applicable to Various Data Types: SMOTE can be applied to datasets with both con
 # Worker thread for training
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
 class Model_Training_for_PHISHINGDETECTOR(QThread):   
-    progress = Signal(int)  # percent
-    finished = Signal(dict, object)  # metrics dict, saved_model_path or None
-    error = Signal(str)
+    progress = Signal(int)              # percent progress %
+    finished = Signal(dict, object)     # metrics dict, saved_model_path or None
+    error = Signal(str)                 # error message
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
     #def __init__(self, csv_path, model_out_path="best_phishing_model.pkl", random_state=42, parent=None):   # default output path (add name for changes and updates) 42 is set because it's a common convention for reproducibility
     def __init__(self, csv_path, model_out_path="best_phishing_model.pkl", random_state=17, parent=None):    # Osias Random state changed to 17
