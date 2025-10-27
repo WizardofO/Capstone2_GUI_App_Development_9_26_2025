@@ -68,7 +68,7 @@ class Model_Training_for_PHISHINGDETECTOR(QThread):
 # ------------------------------------------------------------------------------------------------------------------------------------------ #
     def run(self):
         try:
-            self.progress.emit(5)      # 5% was use to indicate that the training process is at 5% completion.               
+            self.progress.emit(5)                   # 5% was use to indicate that the training process is at 5% completion.               
             df = pd.read_csv(self.csv_path, encoding="utf-8")
             # find label column
             label_col = next((c for c in ["label", "Label", "y"] if c in df.columns), None)             # look for common label column names
@@ -87,12 +87,12 @@ class Model_Training_for_PHISHINGDETECTOR(QThread):
                 numeric[label_col] = df[label_col]                                                      # if not, add it from original df      
 
             # drop constant columns
-            numeric = numeric.loc[:, numeric.nunique() > 1]                                             # this code is for dropping constant columns
+            numeric = numeric.loc[:, numeric.nunique() > 1]                                             # this code is for dropping constant columns meaning columns with only one unique value as they do not provide any useful information for model training.
 
             X = numeric.drop(columns=[label_col])                                                            
-            y = numeric[label_col]
-            X = X.fillna(X.median())
-            self.progress.emit(20)
+            y = numeric[label_col]                  # separate features and labels
+            X = X.fillna(X.median())                # fill missing with median
+            self.progress.emit(20)                  # 20% was use to indicate that the training process is at 20% completion.
 
             # train/test split (stratified)
             from sklearn.model_selection import train_test_split                    # test_size=0.20 means 20% of data is for testing, 80% for training. 
@@ -116,10 +116,10 @@ class Model_Training_for_PHISHINGDETECTOR(QThread):
                 if ratio < 0.5:
                     warn_imbalance = True  
 
-            self.progress.emit(45)     # 45% was use to indicate that the training process is at 45% completion.
+            self.progress.emit(45)                  # 45% was use to indicate that the training process is at 45% completion.
                                        
             # scaler for NB
-            scaler = StandardScaler()                       # standardizes features by removing the mean and scaling to unit variance meaning each feature will have a mean of 0 and a standard deviation of 1.
+            scaler = StandardScaler()                       # standardizes features by removing the mean and scaling to unit variance meaning each feature will have a mean of 0 and a standard deviation of 1. This was used to ensure that all features contribute equally to the distance calculations in algorithms like Naive Bayes.
             X_train_s = scaler.fit_transform(X_train_bal)   # fit and transform on training balanced set
             X_test_s = scaler.transform(X_test)             # only transform on test set
 
@@ -135,7 +135,7 @@ class Model_Training_for_PHISHINGDETECTOR(QThread):
             models = {
                 "RandomForest": (rf, X_train_bal, X_test),      # RandomForest uses balanced data without scaling meaning it can handle raw numeric data 
                 "DecisionTree": (dt, X_train_bal, X_test),      # DecisionTree uses balanced data without scaling
-                "NaiveBayes": (nb, X_train_s, X_test_s),        # NaiveBayes uses scaled data meaning it needs standardized input and
+                "NaiveBayes": (nb, X_train_s, X_test_s),        # NaiveBayes uses scaled data meaning it needs standardized input  
                 "VotingTrees": (voting, X_train_bal, X_test)    # Voting of trees uses balanced data without scaling
             }
 
@@ -155,7 +155,7 @@ class Model_Training_for_PHISHINGDETECTOR(QThread):
                     y_proba = None
 
                 metrics = {
-                    "accuracy": float(accuracy_score(y_test, y_pred)),
+                    "accuracy": float(accuracy_score(y_test, y_pred)),                                          #
                     "precision": float(precision_score(y_test, y_pred, zero_division=0)),
                     "recall": float(recall_score(y_test, y_pred, zero_division=0)),
                     "f1": float(f1_score(y_test, y_pred, zero_division=0)),
@@ -168,8 +168,8 @@ class Model_Training_for_PHISHINGDETECTOR(QThread):
             self.progress.emit(90)
 
             # pick best by F1
-            best_name = max(results.keys(), key=lambda k: results[k]["f1"])
-            best_model_obj = models[best_name][0]
+            best_name = max(results.keys(), key=lambda k: results[k]["f1"])         # This code block is for selecting the best-performing model based on the F1 score from the evaluation results.
+            best_model_obj = models[best_name][0]                                   # Then this code retrieves the corresponding model object for that best-performing model.
 
             # Save model and scaler (we save scaler even though NB needs it; store both)
             to_save = {
@@ -180,7 +180,7 @@ class Model_Training_for_PHISHINGDETECTOR(QThread):
             }
             joblib.dump(to_save, self.model_out_path)       # Saving the trained model to the specified output path
 
-            self.progress.emit(100)                         # SHOW THAT THE PROGRESS REPORT IS COMPLETE
+            self.progress.emit(100)                  # 100 % SHOW THAT THE PROGRESS REPORT IS COMPLETE
 
             # CHECK AND BALANCE: Warn user if imbalance is detected and SMOTE is not available
             if warn_imbalance:
