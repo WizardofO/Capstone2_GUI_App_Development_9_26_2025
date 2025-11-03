@@ -1,0 +1,110 @@
+{
+  "url": "https://bdo.com-ph.lc/cancel",
+  "timestamp": "2025-11-03 21:10:49",
+  "features": {
+    "url_length": {
+      "value": "28",
+      "explanation": "Long URLs are often used to obfuscate phishing attempts."
+    },
+    "url_shortening": {
+      "value": "0",
+      "explanation": "URL shorteners can hide the true destination (phishing tactic)."
+    },
+    "redirection_symbol": {
+      "value": "0",
+      "explanation": "Multiple '//' in URL path may indicate redirection tricks."
+    },
+    "hyphen_in_domain": {
+      "value": "1",
+      "explanation": "Hyphens in domain names are more common in phishing sites."
+    },
+    "too_many_subdomains": {
+      "value": "1",
+      "explanation": "Excessive subdomains can mimic legitimate domains."
+    },
+    "https_in_string": {
+      "value": "0",
+      "explanation": "'https' in the path/query may be used to appear secure."
+    },
+    "ssl_tls_validity": {
+      "value": "0",
+      "explanation": "Checks if SSL/TLS is valid (phishing sites may lack it)."
+    },
+    "domain_registration_length": {
+      "value": "0",
+      "explanation": "Short-lived domains are often used for phishing."
+    },
+    "external_favicon": {
+      "value": "0",
+      "explanation": "External favicons may indicate phishing."
+    },
+    "count_dots": {
+      "value": "2",
+      "explanation": "Many dots in the URL can indicate obfuscation."
+    },
+    "suspicious_chars": {
+      "value": "0",
+      "explanation": "Suspicious characters (?, %, &, =, +) are often used in phishing URLs."
+    },
+    "use_script": {
+      "value": "0",
+      "explanation": "Use of scripts can be used for malicious purposes."
+    },
+    "count_third_party_domains": {
+      "value": "0",
+      "explanation": "Many third-party domains can be suspicious."
+    },
+    "use_meta": {
+      "value": "0",
+      "explanation": "Meta tags can be abused for phishing."
+    },
+    "script_external_ratio": {
+      "value": "0",
+      "explanation": "High ratio of external scripts may be suspicious."
+    },
+    "use_form": {
+      "value": "0",
+      "explanation": "Phishing sites often use forms to steal data."
+    },
+    "mailto": {
+      "value": "0",
+      "explanation": "'mailto:' links can be used for phishing."
+    },
+    "website_forwarding": {
+      "value": "0",
+      "explanation": "Forwarding can hide the real destination."
+    },
+    "status_bar_customization": {
+      "value": "0",
+      "explanation": "Custom status bars can hide true links."
+    },
+    "popups": {
+      "value": "0",
+      "explanation": "Popups are often used in phishing."
+    },
+    "iframes": {
+      "value": "0",
+      "explanation": "Iframes can be used to load malicious content."
+    },
+    "sensitive_forms": {
+      "value": "0",
+      "explanation": "Sensitive forms are a phishing indicator."
+    },
+    "domain_age": {
+      "value": "0",
+      "explanation": "Young domains are more likely to be phishing."
+    },
+    "dns_record_count": {
+      "value": "0",
+      "explanation": "Low DNS record count can indicate a suspicious site."
+    },
+    "whois_suspicious_tokens": {
+      "value": "0",
+      "explanation": "Suspicious WHOIS info can indicate phishing."
+    }
+  },
+  "prediction": null,
+  "probability": null,
+  "verdict": null,
+  "explanation": "Summary Report (Top 10 Features):\n\nuse_meta: (importance: 0.2091)\n  Value: 0\n  Explanation: Meta tags can be abused for phishing.\n\nscript_external_ratio: (importance: 0.1710)\n  Value: 0\n  Explanation: High ratio of external scripts may be suspicious.\n\nuse_script: (importance: 0.1351)\n  Value: 0\n  Explanation: Use of scripts can be used for malicious purposes.\n\nuse_form: (importance: 0.1105)\n  Value: 0\n  Explanation: Phishing sites often use forms to steal data.\n\ndomain_age: (importance: 0.1053)\n  Value: 0\n  Explanation: Young domains are more likely to be phishing.\n\ndomain_registration_length: (importance: 0.0974)\n  Value: 0\n  Explanation: Short-lived domains are often used for phishing.\n\ndns_record_count: (importance: 0.0357)\n  Value: 0\n  Explanation: Low DNS record count can indicate a suspicious site.\n\ncount_third_party_domains: (importance: 0.0347)\n  Value: 0\n  Explanation: Many third-party domains can be suspicious.\n\ntoo_many_subdomains: (importance: 0.0299)\n  Value: 1\n  Explanation: Excessive subdomains can mimic legitimate domains.\n\nhttps_in_string: (importance: 0.0191)\n  Value: 0\n  Explanation: 'https' in the path/query may be used to appear secure.\n\n\nVerdict Confidence: 99.00%\n\nTop Risk Indicators:\n- too_many_subdomains: Excessive subdomains can mimic legitimate domains."
+}

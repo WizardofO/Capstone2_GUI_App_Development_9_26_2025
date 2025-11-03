@@ -90,7 +90,7 @@ class PhishingFeatureExtractor:
         self.parsed = urlparse(url) if url else None
         self.scheme = self.parsed.scheme if self.parsed else 'http'
         self.domain = normalize_domain(self.parsed.hostname) if self.parsed else ''
-        self.ext = tldextract.extract(url) if url else None
+        self.ext = tldextract.extract(url) if url else None                                 # tdlextract was used to parse the URL and extract its components such as subdomain, domain, and suffix.
         self.soup = None
         if html_content is not None:
             self.html = html_content

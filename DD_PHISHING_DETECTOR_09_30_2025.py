@@ -656,7 +656,7 @@ class SingleURLWorker(QThread):
             try:
                 if hasattr(model, 'feature_importances_'):
                     importances = np.array(model.feature_importances_)
-                    idxs = np.argsort(importances)[::-1][:8]
+                    idxs = np.argsort(importances)[::-1][:8] # :10 is top 10 features
                     for i in idxs:
                         explanation.append({'feature': feature_list[i], 'importance': float(importances[i]), 'value': feats.get(feature_list[i])})
             except Exception:

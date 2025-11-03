@@ -11,7 +11,7 @@ PySide6 GUI wrapper around the 35-feature phishing extractor.
         Stop
         Save CSV
         Save JSON.
-3. Concurrent extraction using ThreadPoolExecutor (configurable workers).
+3. added Concurrent extraction using ThreadPoolExecutor (to manage extraction process and hanging to also configurable workers).
 """
 import sys                                                          # used for system-specific parameters and functions
 import os                                                           # used for environment variables and file path operations

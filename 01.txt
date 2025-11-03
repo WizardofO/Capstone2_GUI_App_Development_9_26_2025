@@ -1,0 +1,161 @@
+Phishing Detection Report
+==================================================
+
+URL: https://bdo.com-ph.lc/cancel
+Date: 2025-11-03 21:10:54
+
+VERDICT: Unknown
+
+Feature Analysis:
+--------------------------------------------------
+
+url_length:
+  Value: 28
+  Explanation: Long URLs are often used to obfuscate phishing attempts.
+
+url_shortening:
+  Value: 0
+  Explanation: URL shorteners can hide the true destination (phishing tactic).
+
+redirection_symbol:
+  Value: 0
+  Explanation: Multiple '//' in URL path may indicate redirection tricks.
+
+hyphen_in_domain:
+  Value: 1
+  Explanation: Hyphens in domain names are more common in phishing sites.
+
+too_many_subdomains:
+  Value: 1
+  Explanation: Excessive subdomains can mimic legitimate domains.
+
+https_in_string:
+  Value: 0
+  Explanation: 'https' in the path/query may be used to appear secure.
+
+ssl_tls_validity:
+  Value: 0
+  Explanation: Checks if SSL/TLS is valid (phishing sites may lack it).
+
+domain_registration_length:
+  Value: 0
+  Explanation: Short-lived domains are often used for phishing.
+
+external_favicon:
+  Value: 0
+  Explanation: External favicons may indicate phishing.
+
+count_dots:
+  Value: 2
+  Explanation: Many dots in the URL can indicate obfuscation.
+
+suspicious_chars:
+  Value: 0
+  Explanation: Suspicious characters (?, %, &, =, +) are often used in phishing URLs.
+
+use_script:
+  Value: 0
+  Explanation: Use of scripts can be used for malicious purposes.
+
+count_third_party_domains:
+  Value: 0
+  Explanation: Many third-party domains can be suspicious.
+
+use_meta:
+  Value: 0
+  Explanation: Meta tags can be abused for phishing.
+
+script_external_ratio:
+  Value: 0
+  Explanation: High ratio of external scripts may be suspicious.
+
+use_form:
+  Value: 0
+  Explanation: Phishing sites often use forms to steal data.
+
+mailto:
+  Value: 0
+  Explanation: 'mailto:' links can be used for phishing.
+
+website_forwarding:
+  Value: 0
+  Explanation: Forwarding can hide the real destination.
+
+status_bar_customization:
+  Value: 0
+  Explanation: Custom status bars can hide true links.
+
+popups:
+  Value: 0
+  Explanation: Popups are often used in phishing.
+
+iframes:
+  Value: 0
+  Explanation: Iframes can be used to load malicious content.
+
+sensitive_forms:
+  Value: 0
+  Explanation: Sensitive forms are a phishing indicator.
+
+domain_age:
+  Value: 0
+  Explanation: Young domains are more likely to be phishing.
+
+dns_record_count:
+  Value: 0
+  Explanation: Low DNS record count can indicate a suspicious site.
+
+whois_suspicious_tokens:
+  Value: 0
+  Explanation: Suspicious WHOIS info can indicate phishing.
+
+
+Detailed Analysis:
+--------------------------------------------------
+Summary Report (Top 10 Features):
+
+use_meta: (importance: 0.2091)
+  Value: 0
+  Explanation: Meta tags can be abused for phishing.
+
+script_external_ratio: (importance: 0.1710)
+  Value: 0
+  Explanation: High ratio of external scripts may be suspicious.
+
+use_script: (importance: 0.1351)
+  Value: 0
+  Explanation: Use of scripts can be used for malicious purposes.
+
+use_form: (importance: 0.1105)
+  Value: 0
+  Explanation: Phishing sites often use forms to steal data.
+
+domain_age: (importance: 0.1053)
+  Value: 0
+  Explanation: Young domains are more likely to be phishing.
+
+domain_registration_length: (importance: 0.0974)
+  Value: 0
+  Explanation: Short-lived domains are often used for phishing.
+
+dns_record_count: (importance: 0.0357)
+  Value: 0
+  Explanation: Low DNS record count can indicate a suspicious site.
+
+count_third_party_domains: (importance: 0.0347)
+  Value: 0
+  Explanation: Many third-party domains can be suspicious.
+
+too_many_subdomains: (importance: 0.0299)
+  Value: 1
+  Explanation: Excessive subdomains can mimic legitimate domains.
+
+https_in_string: (importance: 0.0191)
+  Value: 0
+  Explanation: 'https' in the path/query may be used to appear secure.
+
+
+Verdict Confidence: 99.00%
+
+Top Risk Indicators:
+- too_many_subdomains: Excessive subdomains can mimic legitimate domains.

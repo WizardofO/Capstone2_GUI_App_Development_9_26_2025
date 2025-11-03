@@ -17,13 +17,81 @@ import traceback                                        # traceback is for error
 import joblib                                           # joblib is for saving and loading ML models            
 import pandas as pd                                     # pandas is for data manipulation and analysis
 import numpy as np                                      # numpy is for numerical operations
+from dotenv import load_dotenv                          # for loading environment variables
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Configure modern style settings
+STYLE = """
+    QMainWindow {
+        background-color: #f0f2f5;
+    }
+    QPushButton {
+        background-color: #4a90e2;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        font-weight: bold;
+        min-width: 120px;
+    }
+    QPushButton:hover {
+        background-color: #357abd;
+    }
+    QPushButton:disabled {
+        background-color: #cccccc;
+    }
+    QLabel {
+        color: #2c3e50;
+        font-size: 14px;
+    }
+    QTextEdit {
+        border: 2px solid #e0e0e0;
+        border-radius: 4px;
+        padding: 5px;
+        background: white;
+        font-family: 'Consolas', monospace;
+    }
+    QTableWidget {
+        border: 2px solid #e0e0e0;
+        border-radius: 4px;
+        background: white;
+        gridline-color: #f0f0f0;
+    }
+    QTableWidget::item {
+        padding: 5px;
+    }
+    QTableWidget::item:selected {
+        background-color: #4a90e2;
+        color: white;
+    }
+    QProgressBar {
+        border: 2px solid #e0e0e0;
+        border-radius: 5px;
+        text-align: center;
+        background-color: #f5f5f5;
+        height: 25px;
+    }
+    QProgressBar::chunk {
+        background-color: #4a90e2;
+        border-radius: 5px;
+    }
+    QHeaderView::section {
+        background-color: #4a90e2;
+        color: white;
+        padding: 5px;
+        border: 1px solid #357abd;
+    }
+"""
 
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QFileDialog, QLabel, QTextEdit, QProgressBar, QMessageBox,
-    QTableWidget, QTableWidgetItem, QSizePolicy
+    QTableWidget, QTableWidgetItem, QSizePolicy, QGraphicsDropShadowEffect
 )
 from PySide6.QtCore import Qt, Signal, QThread
+from PySide6.QtGui import QColor, QPalette, QFont
 
 # ML imports
 from sklearn.ensemble import RandomForestClassifier, VotingClassifier                               # Selected Methods ensemble methods for classification
@@ -76,10 +144,11 @@ class Model_Training_for_PHISHINGDETECTOR(QThread):
                 self.error.emit("No label column found in CSV (expected 'label').")                     # if not found, emit error and
                 return
             # coerce label                                                                              
-            df[label_col] = pd.to_numeric(df[label_col], errors="make it invalid")                      # convert label to numeric, invalids to NaN
+            # Use errors='coerce' so invalid/non-numeric values become NaN (then dropped below)
+            df[label_col] = pd.to_numeric(df[label_col], errors='coerce')                      # convert label to numeric, invalids to NaN
             df = df.dropna(subset=[label_col])                                                          # drop rows with NaN labels
             df[label_col] = df[label_col].astype(int)                                                   # convert label to int                    
-            self.progress.emit(10)                                                                      # This code block is for preprocessing the data, handling missing values, and preparing it for model training
+            self.progress.emit(10)   # PROGRESS CHECK                                                   # This code block is for preprocessing the data, handling missing values, and preparing it for model training
 
             # keep numeric ready of Machine learning only
             numeric = df.select_dtypes(include=[np.number]).copy()                                      # select only numeric columns      
@@ -92,7 +161,7 @@ class Model_Training_for_PHISHINGDETECTOR(QThread):
             X = numeric.drop(columns=[label_col])                                                            
             y = numeric[label_col]                  # separate features and labels
             X = X.fillna(X.median())                # fill missing with median
-            self.progress.emit(20)                  # 20% was use to indicate that the training process is at 20% completion.
+            self.progress.emit(20)   # PROGRESS CHECK # 20% was use to indicate that the training process is at 20% completion.
 
             # train/test split (stratified)
             from sklearn.model_selection import train_test_split                    # test_size=0.20 means 20% of data is for testing, 80% for training. 
@@ -116,7 +185,7 @@ class Model_Training_for_PHISHINGDETECTOR(QThread):
                 if ratio < 0.5:
                     warn_imbalance = True  
 
-            self.progress.emit(45)                  # 45% was use to indicate that the training process is at 45% completion.
+            self.progress.emit(45)    # PROGRESS CHECK   # 45% was use to indicate that the training process is at 45% completion.
                                        
             # scaler for NB
             scaler = StandardScaler()                       # standardizes features by removing the mean and scaling to unit variance meaning each feature will have a mean of 0 and a standard deviation of 1. This was used to ensure that all features contribute equally to the distance calculations in algorithms like Naive Bayes.
@@ -200,8 +269,18 @@ class Model_Training_for_PHISHINGDETECTOR(QThread):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Phishing Model Pipeline Training GUI - Capstione2 by Osias Nieva Jr")
-        self.resize(1000, 700)
+        self.setWindowTitle("Phishing Model Pipeline Training GUI - Capstone2 by Osias Nieva Jr")
+        self.resize(1200, 800)
+        
+        # Apply the modern style
+        self.setStyleSheet(STYLE)
+        
+        # Add shadow effect to the window
+        shadow = QGraphicsDropShadowEffect()
+        shadow.setBlurRadius(20)
+        shadow.setColor(QColor(0, 0, 0, 60))
+        shadow.setOffset(0, 0)
+        self.setGraphicsEffect(shadow)
 
         self.csv_path = None
         self.model_path = None
